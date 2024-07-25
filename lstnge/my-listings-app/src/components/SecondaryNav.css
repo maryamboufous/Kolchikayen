@@ -1,0 +1,18 @@
+/* src/components/SecondaryNav.css */
+.secondary-nav {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .secondary-nav a {
+    margin: 0 10px;
+    text-decoration: none;
+    color: black;
+  }
+  
+  .secondary-nav a.active {
+    font-weight: bold;
+    color: blue;
+  }
+  

@@ -1,0 +1,9 @@
+.greenline {
+    width: 80%;
+    height: 3px;
+    /* UI Properties */
+    background: #3B9943 0% 0% no-repeat padding-box;
+    border-radius: 9px;
+    opacity: 1;
+  }
+  

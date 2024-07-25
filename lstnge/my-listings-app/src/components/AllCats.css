@@ -1,0 +1,24 @@
+.Categories{
+width: 100%;
+padding: 30px 0;
+display: flex;
+align-items: center;
+justify-content: center;
+flex-direction: column;
+}
+
+.categories-ele{
+    padding: 30px 0;
+    display: flex;
+    width: 80%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+flex-wrap: wrap;
+
+}
+.categories-ele img{
+    cursor:pointer;
+
+}

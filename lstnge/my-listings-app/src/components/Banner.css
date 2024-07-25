@@ -1,0 +1,39 @@
+.banner{
+    width: 90%;
+    padding: 40px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+.banner img{
+    width: 95%;
+}
+.Listings-choice{
+
+    width: 80%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+}
+.choice-container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+}
+.Listing{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    border: 1px #d3d3d3 solid;
+    border-radius: 13px;
+    padding: 10px 20px;
+    background-color:#d3d3d3 ;
+}
+.Listing img{
+    width: 60px;
+}

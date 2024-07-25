@@ -1,0 +1,269 @@
+/* src/components/UpperNav.css */
+.upper-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    background-color: #ffffff; /* Green background */
+    padding: 10px 0px;
+    width: 100%;
+    gap: 2px;
+  }
+  /* #4CAF50 */
+  .upper-nav button{
+    
+    cursor: pointer;
+  }
+  
+  .nav-logo {
+    display: flex;
+    align-items: center;
+  }
+  
+  .nav-logo img {
+    width: 50px; /* Adjust size as needed */
+    height: 50px; /* Adjust size as needed */
+  }
+  
+  .nav-logo .username {
+    font-size: 50px;
+    color: #4CAF50;
+    font-weight: bold;
+  }
+  
+  .nav-search {
+    display: flex;
+    align-items: center;
+    /* flex-grow: 1; */
+    margin: 0 20px;
+  }
+  
+  .nav-search input[type="text"] {
+    padding: 5px;
+    margin-right: 5px;
+    border: none;
+    border-radius: 5px;
+  }
+  
+  .categoriess {
+    background-color: #ccc;
+    border: none;
+    padding: 5px 10px;
+    margin-right: 5px;
+    cursor: pointer;
+  }
+  
+  .search-button {
+    background-color: rgb(238, 236, 236);
+    border: none;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 200px;
+    cursor: pointer;
+  }
+  .searchholder{
+    background-color: rgb(238, 236, 236);
+    padding: 4px;
+    border-radius: 5px;
+    width: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+  .searchholder input{
+    border: none;
+    background-color: rgb(238, 236, 236);
+  }
+  .searchholder input:focus{
+    outline: none;
+  }
+  
+  .nav-buttons button {
+    margin-left: 10px;
+    padding: 10px 60px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+
+  }
+  
+  .post-ad {
+    background-color: #4CAF50;
+    color: black;
+    border: none;
+    border-radius: 17px;
+    padding: 10px;
+    margin-left: 30px;
+  }
+  
+  .create-account {
+    background-color: white;
+    color: black;
+    border: none;
+    border-radius: 17px;
+    padding: 10px;
+  }
+  
+  .login {
+    background-color: #4CAF50;
+    border: none;
+    color: black;
+    border-radius: 17px;
+    padding: 10px;
+  }
+  /* Add this CSS to your existing Uppernav.css file */
+    .burger-menu {
+      display: none;
+    }
+  
+    .nav-links {
+      display: flex;
+      gap: 10px;
+    }
+@media (max-width: 768px) {
+
+  .burger-menu {
+    display: block !important;
+  }
+
+  .nav-links {
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: green;
+    height: 100vh;
+    transform: translateX(-110%);
+    transition: transform 1s ease;
+    z-index: 100;
+  }
+
+  .nav-links.show {
+    display: flex;
+    transform: translateX(0%);
+    transition: transform 1s ease;
+  }
+  
+  /* Add this CSS to your existing Uppernav.css file */
+
+/* Styling for navbar */
+.upper-nav {
+  display: flex;
+  flex-direction: row; /* Change to column to make content vertical */
+  align-items: center; /* Center items horizontally */
+  justify-content: space-around;
+}
+
+.nav-logo {
+}
+
+.nav-links {
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+  justify-content: flex-start;
+  padding-top: 90px;
+  gap: 10px; 
+}
+
+.nav-buttons {
+  display: flex;
+  flex-direction: column; /* Make buttons display vertically */
+  align-items: center; /* Center items horizontally */
+}
+
+}
+
+
+/* Add this CSS to your existing Uppernav.css file */
+
+/* Styling for burger menu */
+.burger-menu {
+  display: none;
+  cursor: pointer;
+}
+
+.bar {
+  width: 25px;
+  height: 3px;
+  background-color: #333;
+  margin: 5px 0;
+  transition: 0.4s;
+}
+
+.change .bar:nth-child(1) {
+  transform: rotate(-45deg) translate(-5px, 6px);
+}
+
+.change .bar:nth-child(2) {
+  opacity: 0;
+}
+
+.change .bar:nth-child(3) {
+  transform: rotate(45deg) translate(-5px, -6px);
+}
+
+/* src/components/Uppernav.css */
+.upper-nav .logout, .upper-nav .profile {
+  background-color: #4CAF50;
+  color: rgb(255, 255, 255);
+  border: none;
+  border-radius: 17px;
+  padding: 10px;
+  margin: 0 5px;
+}
+
+.upper-nav .logout, .upper-nav .favoris {
+  background-color: #4CAF50;
+  color: rgb(255, 255, 255);
+  border: none;
+  border-radius: 17px;
+  padding: 10px;
+  margin: 0 5px;
+}
+
+.icon-button {
+  background-color: transparent;
+  border: none;
+  color: rgb(0, 0, 0);
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.post-ad, .create-account, .login, .logout {
+  background-color: #4CAF50;
+  color: rgb(255, 255, 255);
+  border: none;
+  border-radius: 10px;
+  padding: 6px 20px;
+  font-weight:bolder;
+  margin-left: 20px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.welcome-text{
+  margin-top: 10px;
+  margin-left: 15px;
+  padding-right:20px ;
+  font-size: 20px;
+  
+}
+
+/* src/components/Uppernav.css */
+.categories-bar {
+  display: flex;
+  justify-content: center;
+  background-color: #f0ecec;
+  padding: 20px 0;
+  width: 100%;
+}
+
+.categories-bar span {
+  margin: 0 37px;
+  color: rgb(92, 88, 88);
+  cursor: pointer;
+  font-size: larger;
+}
+

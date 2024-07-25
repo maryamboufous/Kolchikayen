@@ -1,0 +1,13 @@
+@font-face {
+    font-family: 'Bebas';
+    src: url(../assets/BebasNeue-Regular.ttf);
+  }
+.home {
+    font-family: Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-family: 'Bebas';
+    width: 100%;
+  }
