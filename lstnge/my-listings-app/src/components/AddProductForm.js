@@ -168,7 +168,6 @@ const AddProductForm = () => {
     for (let i = 0; i < productImages.length; i++) {
       formData.append('images', productImages[i]);
     }
-
     try {
       const response = await fetch('http://localhost:5001/add-product', {
         method: 'POST',
