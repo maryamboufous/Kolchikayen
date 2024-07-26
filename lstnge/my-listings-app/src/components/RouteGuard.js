@@ -14,7 +14,9 @@ const RouteGuard = ({ children }) => {
     const fetchCountry = async (lat, lng) => {
       try {
         const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json?q=${lat},${lng}&key=ecc7f860f730475f9d7f92f92e8f6c5d`);
-        setCountry(response.data.results[0].components.country);
+        const fetchedCountry = response.data.results[0].components.country;
+        setCountry(fetchedCountry);
+        localStorage.setItem('country', fetchedCountry); // Store country information
         setLoading(false); // Finished loading
       } catch (error) {
         console.error('Error fetching country:', error);
@@ -39,7 +41,13 @@ const RouteGuard = ({ children }) => {
       }
     };
 
-    getLocation();
+    const storedCountry = localStorage.getItem('country');
+    if (storedCountry) {
+      setCountry(storedCountry);
+      setLoading(false); // Skip loading if country is already stored
+    } else {
+      getLocation();
+    }
   }, []);
 
   const allowedCountries = ['Morocco', 'France', 'Maroc'];
@@ -49,7 +57,7 @@ const RouteGuard = ({ children }) => {
     return <div>Loading...</div>; // Show a loading indicator while fetching location
   }
 
-  if (!isAllowedCountry && ['/login', '/signup'].includes(location.pathname)) {
+  if (!isAllowedCountry && ['/login', '/signup', '/Favoris', '/Cart', '/Buy', '/Profile', '/Messages', '/userpage/add-product-form', '/store', '/edit-product/:productId'].includes(location.pathname)) {
     return <Navigate to="/Home" />;
   }
 

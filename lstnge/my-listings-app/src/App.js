@@ -20,7 +20,7 @@ import Buy from './components/Buy';
 import { UserProvider } from './context/UserContext';
 import Uppernav from './components/Uppernav';
 import SecondaryNav from './components/SecondaryNav';
-import RouteGuard from './components/RouteGuard'; // Import the RouteGuard component
+import RouteGuard from './components/RouteGuard'; // Import RouteGuard component
 import './App.css';
 
 const App = () => {
@@ -39,20 +39,21 @@ const App = () => {
         <Routes>
           <Route path="/Home" element={<Home />} />
           <Route path="/login" element={<RouteGuard><Login /></RouteGuard>} />
-          <Route path="/signup" element={<RouteGuard><Sign /></RouteGuard>} />          <Route path="/France" element={<FranceListings />} />
+          <Route path="/signup" element={<RouteGuard><Sign /></RouteGuard>} />          
+          <Route path="/France" element={<FranceListings />} />
           <Route path="/Morroco" element={<MoroListings />} />
           <Route path="/Product/:productId" element={<Product />} />
-          <Route path="/Profile" element={<Profile />} />
-          <Route path="/Favoris" element={<Favoris />} />
-          <Route path="/Cart" element={<Cart />} />
-          <Route path="/Buy" element={<Buy />} />
+          <Route path="/Profile" element={<RouteGuard><Profile /></RouteGuard>} />
+          <Route path="/Favoris" element={<RouteGuard><Favoris /></RouteGuard>} />
+          <Route path="/Cart" element={<RouteGuard><Cart /></RouteGuard>} />
+          <Route path="/Buy" element={<RouteGuard><Buy /></RouteGuard>} />
           <Route path="/" element={<Home />} />
-          <Route path="/Messages" element={<Messages />} />
+          <Route path="/Messages" element={<RouteGuard><Messages /></RouteGuard>} />
           <Route path="/Allcategories" element={<AllCats />} />
           <Route path="/userpage" element={<Home />} />
-          <Route path="/userpage/add-product-form" element={<AddProductForm />} />
-          <Route path="/store" element={<Store />} />
-          <Route path="/edit-product/:productId" element={<EditProduct />} />
+          <Route path="/userpage/add-product-form" element={<RouteGuard><AddProductForm /></RouteGuard>}/>
+          <Route path="/store" element={<RouteGuard><Store /></RouteGuard>} />
+          <Route path="/edit-product/:productId" element={<RouteGuard><EditProduct /></RouteGuard>}/>
           <Route path="/all-categories" element={<AllCats />} />
           <Route path="/products/category/:category" element={<CategoryProducts />} />
         </Routes>

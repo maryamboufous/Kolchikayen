@@ -1,6 +1,4 @@
-
 require('dotenv').config();
-
 const express = require('express');
 const session = require('express-session');
 const app = express();
@@ -14,7 +12,6 @@ const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 
 const mongoUrl = 'mongodb+srv://maryam:Merybouf123@cluster0.najmn7n.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-
 mongoose.connect(mongoUrl).then(() => {
   console.log("Database Connected");
 }).catch((e) => {
@@ -68,36 +65,23 @@ app.post('/send-verification-code', async (req, res) => {
     res.status(200).json({ status: 'ok', data: { verificationCode } });
   });
 });
-
-
-
-
 // Uploades Images from Form:
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  }
-});
-
+const storage = multer.memoryStorage(); // Change to memory storage
 const upload = multer({ storage: storage });
+
+
 
 // Start App
 app.get("/", (req, res) => {
   res.send({ status: "started" });
 });
 
-
-
-
-// Add Product in Listings
+/// Add Product in Listings
 app.post('/add-product', upload.array('images', 5), async (req, res) => {
   console.log("Received Add Product request");
 
   const { id, name, category, description, price, donation, isAvailable, country, userId, condition, email, phone } = req.body;
-  const images = req.files.map(file => file.path);
+  const images = req.files.map(file => file.buffer); // Store images as Buffer
 
   console.log("Request Body:", req.body);
 
@@ -157,9 +141,21 @@ app.get('/products/category/:category', async (req, res) => {
   }
 });
 
+// Serve images directly from MongoDB
+app.get('/product-image/:productId/:imageIndex', async (req, res) => {
+  const { productId, imageIndex } = req.params;
+  try {
+    const product = await Product.findById(productId);
+    if (!product || !product.images[imageIndex]) {
+      return res.status(404).send('Image not found');
+    }
+    res.set('Content-Type', 'image/jpeg');
+    res.send(product.images[imageIndex]);
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+});
 
-// Serve static files from the uploads directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Get all products
 app.get('/products', async (req, res) => {
@@ -170,6 +166,8 @@ app.get('/products', async (req, res) => {
     res.status(500).json({ status: 'error', message: 'Internal server error' });
   }
 });
+
+
 
 // Like Product
 app.post('/like-product', async (req, res) => {
@@ -224,7 +222,6 @@ app.get('/products/:productId', async (req, res) => {
   }
 });
 
-
 app.delete('/products/:id', async (req, res) => {
   const productId = req.params.id;
 
@@ -244,7 +241,6 @@ app.delete('/products/:id', async (req, res) => {
     res.status(500).send('Server error');
   }
 });
-
 
 app.delete('/products/products/:id', async(req, res) =>{
   const productId = req.param.id;
@@ -266,7 +262,7 @@ app.delete('/products/products/:id', async(req, res) =>{
 app.put('/edit-product/:id', upload.array('images', 5), async (req, res) => {
   const productId = req.params.id;
   const { name, category, description, price, isAvailable, country, userId } = req.body;
-  const images = req.files.map(file => file.path);
+  const images = req.files.map(file => file.buffer); // Store images as Buffer
 
   try {
     const product = await Product.findById(productId);
@@ -291,11 +287,9 @@ app.put('/edit-product/:id', upload.array('images', 5), async (req, res) => {
     res.send({ status: 'ok', data: 'Product updated successfully' });
   } catch (error) {
     console.error('Error updating product:', error);
-    res.status(500).send({ status: 'error', data: 'Error updating product' });
+    res.status(500).send({ status: 'error', data: error.message });
   }
 });
-
-
 //uuser infos are done i guess 
 // Get user by ID
 app.get('/users/:userId', async (req, res) => {
@@ -311,7 +305,6 @@ app.get('/users/:userId', async (req, res) => {
     res.status(500).json({ status: 'error', message: 'Internal server error' });
   }
 });
-
 // Update user details
 app.put('/users/:userId', async (req, res) => {
   const { userId } = req.params; // Changed line
@@ -341,8 +334,6 @@ app.put('/users/:userId', async (req, res) => {
     res.status(500).json({ status: 'error', message: 'Internal server error' });
   }
 });
-
-
 // Get liked products of a user
 app.get('/user/:userId/liked-products', async (req, res) => {
   const { userId } = req.params;
@@ -373,8 +364,6 @@ app.get('/products/user/:userId', async (req, res) => {
     res.status(500).json({ message: 'Error fetching user products', error });
   }
 });
-
-
 // Add Product to Cart
 app.post('/add-to-cart', async (req, res) => {
   const { userId, productId } = req.body;
@@ -393,8 +382,6 @@ app.post('/add-to-cart', async (req, res) => {
     res.json({ status: 'error', message: error.message });
   }
 });
-
-
 // Get cart products for a user
 app.get('/user/:userId/cart-products', async (req, res) => {
   const { userId } = req.params;
@@ -425,8 +412,6 @@ app.get('/user/:userId/cart-products', async (req, res) => {
     res.status(500).json({ status: 'error', message: 'Internal server error' });
   }
 });
-
-
 // Remove cart product from user
 app.delete('/user/:userId/cart-products/:productId', async (req, res) => {
   const { userId, productId } = req.params;
@@ -449,13 +434,6 @@ app.delete('/user/:userId/cart-products/:productId', async (req, res) => {
     res.status(500).json({ status: 'error', message: 'Internal server error' });
   }
 });
-
-
-
-
-
-
-
 // Sign Up
 app.post('/signup', async (req, res) => {
   const { name, email, mobile, password } = req.body;
@@ -477,10 +455,6 @@ app.post('/signup', async (req, res) => {
     res.status(500).json({ status: 'error', data: error.message });
   }
 });
-
-
-
-
 // Login with Liked session
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;

@@ -175,16 +175,16 @@ const AddProductForm = () => {
       });
   
       const data = await response.json();
-  
       if (data.status === 'ok') {
         console.log('Product added successfully:', data);
+        navigate('/Home');
       } else {
-        console.error('Error adding product:', data.data);
-        setErrorMessage('Error adding product');
+        console.error('Error adding product:', data.message);
+        setErrorMessage(data.message);
       }
     } catch (error) {
       console.error('Error adding product:', error);
-      setErrorMessage('Error adding product');
+      setErrorMessage('An error occurred while adding the product.');
     }
   };
   

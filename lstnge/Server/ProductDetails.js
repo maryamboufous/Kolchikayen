@@ -12,7 +12,7 @@ const productSchema = new mongoose.Schema({
   phone: {type: String, required: true},
   country: { type: String, required: true },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'UserInfo', required: true },
-  images: { type: [String], required: true }
+  images: [Buffer]
 });
 
 productSchema.index({ name: 1, userId: 1 }, { unique: true });
