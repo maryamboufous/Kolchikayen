@@ -80,7 +80,7 @@ app.get("/", (req, res) => {
 app.post('/add-product', upload.array('images', 5), async (req, res) => {
   console.log("Received Add Product request");
 
-  const { id, name, category, description, price, donation, isAvailable, country, userId, condition, email, phone } = req.body;
+  const { id, name, category, customCategory, description, price, donation, isDon, country, userId, condition, email, phone } = req.body;
   const images = req.files.map(file => file.buffer); // Store images as Buffer
 
   console.log("Request Body:", req.body);
@@ -91,24 +91,26 @@ app.post('/add-product', upload.array('images', 5), async (req, res) => {
       return res.status(400).json({ status: 'error', message: 'Product already exists!' });
     }
 
-    const newProduct = new Product({
+    const product = new Product({
       id,
       name,
       category,
+      customCategory: category === 'Autres' ? customCategory : '',
       description,
       price,
-      donation, // Ensure donation is included
+      donation,
+      isDon,
+      country,
+      userId,
       condition,
       email,
       phone,
-      country,
-      userId,
-      images
+      images,
     });
 
-    console.log("New Product:", newProduct);
+    console.log("New Product:", product);
 
-    const savedProduct = await newProduct.save();
+    const savedProduct = await product.save();
     console.log("Saved Product:", savedProduct);
 
     const user = await User.findById(userId);
@@ -133,13 +135,22 @@ app.post('/add-product', upload.array('images', 5), async (req, res) => {
 // Get products by category
 app.get('/products/category/:category', async (req, res) => {
   const { category } = req.params;
+
   try {
-    const products = await Product.find({ category });
-    res.json(products);
+    let products;
+    if (category === 'Autres') {
+      products = await Product.find({ category: 'Autres' });
+    } else {
+      products = await Product.find({ category });
+    }
+
+    res.status(200).json({ status: 'ok', products });
   } catch (error) {
-    res.status(500).json({ status: 'error', message: 'Internal server error' });
+    console.error('Error fetching products by category:', error);
+    res.status(500).json({ status: 'error', message: 'Error fetching products' });
   }
 });
+
 
 // Serve images directly from MongoDB
 app.get('/product-image/:productId/:imageIndex', async (req, res) => {

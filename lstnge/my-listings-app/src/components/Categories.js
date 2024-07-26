@@ -22,6 +22,7 @@ const categories = [
   { icon: Books, label: 'Books' },
   { icon: Electro, label: 'Electro' },
   { icon: Maison, label: 'Maison' },
+  
 ];
 
 const Categories = () => {

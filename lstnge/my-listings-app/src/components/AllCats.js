@@ -17,6 +17,7 @@ const categories = [
   { icon: Telephones, label: 'Telephones' },
   { icon: Ordinateurs, label: 'Ordinateurs' },
   { icon: Vetements, label: 'Vetements' },
+  {icon: Vetements, label: 'Autres'},
 ];
 
 const AllCats = () => {

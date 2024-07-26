@@ -72,7 +72,7 @@ const Product = () => {
         <Swiper spaceBetween={50} slidesPerView={1}>
           {product.images.map((image, index) => (
             <SwiperSlide key={index}>
-              <img src={`http://localhost:5001/${image}`} alt={`Product ${index + 1}`} />
+              <img src={`http://localhost:5001/product-image/${product._id}/0`} alt={product.name} />
             </SwiperSlide>
           ))}
         </Swiper>
@@ -83,6 +83,9 @@ const Product = () => {
         </div>
         <div className="price">
           <p>{product.price} DH</p>
+        </div>
+        <div className="title-box">
+          <p className="title">{product.category}</p>
         </div>
       </div>
       <div className="seller-informations">

@@ -26,6 +26,7 @@ const Header = () => {
           <li><a href="#">Électronique</a></li>
           <li><a href="#">Loisirs</a></li>
           <li><a href="#">Autres</a></li>
+          <li><a href='#'>Donations</a></li>
           <li><img src=''></img></li>
           <li><a href='#' className="France">France</a></li>
         </ul>

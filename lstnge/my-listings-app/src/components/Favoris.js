@@ -91,7 +91,7 @@ const Favoris = () => {
               <div className="favoris-item" key={product._id}>
                 <Link to={`/Product/${product._id}`} className="btntoprod">
                   <img
-                    src={`http://localhost:5001/${product.images[0]}`}
+                    src={`http://localhost:5001/product-image/${product._id}/0`} 
                     alt={product.name}
                     className="favoris-item-image"
                   />

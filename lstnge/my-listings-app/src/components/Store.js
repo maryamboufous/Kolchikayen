@@ -46,7 +46,7 @@ const Store = () => {
         {products.map((product) => (
           <div className="product-item" key={product._id}>
           <Link to={`/Product/${product._id}`} className="btntoprod">
-            <img src={`http://localhost:5001/${product.images[0]}`} alt={product.name} />
+            <img src={`http://localhost:5001/product-image/${product._id}/0`}  alt={product.name} />
             </Link>
             <div className="product-details">
               <h3>{product.name}</h3>
