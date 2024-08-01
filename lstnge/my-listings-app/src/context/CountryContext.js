@@ -1,3 +1,4 @@
+// src/context/CountryContext.js
 import React, { createContext, useState, useContext } from 'react';
 
 const CountryContext = createContext();

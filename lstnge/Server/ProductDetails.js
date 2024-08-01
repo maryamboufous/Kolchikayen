@@ -4,13 +4,18 @@ const productSchema = new mongoose.Schema({
   id: { type: String, required: true },
   name: { type: String, required: true },
   category: { type: String, required: true },
+  customCategory: { type: String },  // New field for custom category
   description: { type: String, required: true },
-  price: { type: Number, required: true },
-  donation: { type: Boolean },
-  condition: { type: String, required : true},
-  email: {type: String, required: true},
-  phone: {type: String, required: true},
-  country: { type: String, required: true },
+  price: { type: Number },
+  donation: { type: Boolean, required: true },
+  isDon: { type: Boolean },
+  condition: { type: String, required: true },
+  email: { type: String, required: true },
+  phone: { type: String, required: true },
+  address: {
+    country: { type: String, required: true },
+    city: { type: String, required: true }
+  },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'UserInfo', required: true },
   images: [Buffer]
 });

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useCallback, useEffect } from 'react';
 import { UserContext } from '../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
@@ -10,7 +10,43 @@ import Typography from '@mui/material/Typography';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
+import placeholderIcon from "../assets/placeholder.png"; // Import the image
 import { useTheme } from '@mui/material/styles';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete'; // Import the Delete icon
+import InputAdornment from '@mui/material/InputAdornment';
+
+const NOMINATIM_BASE_URL = "https://nominatim.openstreetmap.org/search?";
+
+const icon = L.icon({
+  iconUrl: placeholderIcon, // Use the imported image
+  iconSize: [38, 38],
+});
+
+const initialPosition = [51.505, -0.09];
+
+function ResetCenterView({ selectPosition }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (selectPosition) {
+      map.setView(
+        L.latLng(selectPosition.lat, selectPosition.lon),
+        map.getZoom(),
+        { animate: true }
+      );
+    }
+  }, [selectPosition, map]);
+
+  return null;
+}
 
 const AddProductForm = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -23,7 +59,8 @@ const AddProductForm = () => {
   const [productDescription, setProductDescription] = useState('');
   const [productPrice, setProductPrice] = useState('');
   const [productIsDon, setProductIsDon] = useState(true);
-  const [productCountry, setProductCountry] = useState('Morocco');
+  const [productCountry, setProductCountry] = useState('');
+  const [productCity, setProductCity] = useState('');
   const [productImages, setProductImages] = useState([]);
   const [productEmail, setProductEmail] = useState('');
   const [productPhone, setProductPhone] = useState('');
@@ -32,6 +69,7 @@ const AddProductForm = () => {
   const [productCondition, setProductCondition] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [mobilePrefix, setMobilePrefix] = useState('+212'); // Default prefix can be set as needed
   const [errors, setErrors] = useState({
     productName: '',
     productCategory: '',
@@ -40,9 +78,17 @@ const AddProductForm = () => {
     productCountry: '',
     productCondition: '',
     productImages: '',
+    email: '',
+    phone : '',
   });
 
   const [customCategory, setCustomCategory] = useState('');
+
+  const [selectPosition, setSelectPosition] = useState(null);
+  const [searchText, setSearchText] = useState("");
+  const [listPlace, setListPlace] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const categories = [
     'Immobilier',
@@ -106,21 +152,35 @@ const AddProductForm = () => {
       } else {
         newErrors.productPrice = '';
       }
+    } else if (activeStep === 4) {
+      if (!productCountry || !productCity) {
+        newErrors.productCountry = 'Veuillez sélectionner un pays et une ville';
+        isValid = false;
+      } else if (productCountry !== 'France' && productCountry !== 'Morocco' && productCountry !== 'Maroc') {
+        newErrors.productCountry = 'Le service n\'est pas disponible dans ce pays';
+        setErrorMessage('Le service n\'est pas disponible dans ce pays');
+        isValid = false;
+      } else {
+        newErrors.productCountry = '';
+        setErrorMessage('');
+      }
     } else if (activeStep === 6) {
-      if (!email) {
-        newErrors.email = 'Veuillez remplir l\'email';
+      if (!email || !/\S+@\S+\.\S+/.test(email)) {
+        newErrors.email = 'Veuillez remplir un email valide';
         isValid = false;
       } else {
         newErrors.email = '';
       }
 
-      if (!phone) {
-        newErrors.phone = 'Veuillez remplir le numéro de téléphone';
+      const phoneRegex = /^\d{9,10}$/;
+      if (!phone || !phoneRegex.test(phone)) {
+        newErrors.phone = 'Veuillez remplir un numéro de téléphone valide (9 ou 10 chiffres)';
         isValid = false;
       } else {
         newErrors.phone = '';
       }
     }
+
 
     setErrors(newErrors);
     return isValid;
@@ -160,6 +220,7 @@ const AddProductForm = () => {
     formData.append('donation', donation);
     formData.append('isDon', productIsDon);
     formData.append('country', productCountry);
+    formData.append('city', productCity);
     formData.append('userId', userId);
     formData.append('condition', productCondition);
     formData.append('email', email);
@@ -194,203 +255,389 @@ const AddProductForm = () => {
     'État du produit',
     'Définir un prix',
     'Informations additionnelles',
-    'Autres informations',
+    'Autres informations ?',
     'Coordonnées',
-    'Autres détails',
     'Révision et soumission'
   ];
+  
 
-  const getStepContent = (step) => {
-    switch (step) {
-      case 0:
-        return (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <TextField
-              label="Titre"
-              value={productName}
-              onChange={(e) => setProductName(e.target.value)}
-              error={Boolean(errors.productName)}
-              helperText={errors.productName}
-              required
-            />
-            <TextField
-              label="Catégorie"
-              select
-              value={productCategory}
-              onChange={(e) => setProductCategory(e.target.value)}
-              error={Boolean(errors.productCategory)}
-              helperText={errors.productCategory}
-              required
-            >
-              <MenuItem value="" disabled>Select a category</MenuItem>
-              {categories.map((category) => (
-                <MenuItem key={category} value={category}>
-                  {category}
-                </MenuItem>
-              ))}
-            </TextField>
-            {productCategory === 'Autres' && (
-              <TextField
-                label="Catégorie personnalisée"
-                value={customCategory}
-                onChange={(e) => setCustomCategory(e.target.value)}
-                error={Boolean(errors.productCategory)}
-                helperText={errors.productCategory}
-                required
-              />
-            )}
-            <TextField
-              label="Description"
-              multiline
-              rows={4}
-              value={productDescription}
-              onChange={(e) => setProductDescription(e.target.value)}
-              error={Boolean(errors.productDescription)}
-              helperText={errors.productDescription}
-              required
-            />
-          </Box>
-        );
-      case 1:
-        return (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Button variant="contained" component="label">
-              Ajouter des photos
-              <input type="file" multiple hidden onChange={(e) => setProductImages([...e.target.files])} />
-            </Button>
-            {productImages.length > 0 && (
-              <Typography variant="body2">
-                {productImages.length} image(s) sélectionnée(s)
-              </Typography>
-            )}
-            {Boolean(errors.productImages) && (
-              <Typography color="error">{errors.productImages}</Typography>
-            )}
-          </Box>
-        );
-      case 2:
-        return (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <TextField
-              label="État du produit"
-              select
-              value={productCondition}
-              onChange={(e) => setProductCondition(e.target.value)}
-              error={Boolean(errors.productCondition)}
-              helperText={errors.productCondition}
-              required
-            >
-              <MenuItem value="" disabled>Select condition</MenuItem>
-              <MenuItem value="Neuf">Neuf</MenuItem>
-              <MenuItem value="Comme neuf">Comme neuf</MenuItem>
-              <MenuItem value="Bon état">Bon état</MenuItem>
-              <MenuItem value="Acceptable">Acceptable</MenuItem>
-              <MenuItem value="Pour pièces">Pour pièces</MenuItem>
-            </TextField>
-          </Box>
-        );
-      case 3:
-        return (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Switch
-              checked={donation}
-              onChange={(e) => setDonation(e.target.checked)}
-              inputProps={{ 'aria-label': 'Donation switch' }}
-            />
-            <Typography>{donation ? 'Ceci est un don' : 'Ceci est une vente'}</Typography>
-            {!donation && (
-              <TextField
-                label="Prix"
-                type="number"
-                value={productPrice}
-                onChange={(e) => setProductPrice(e.target.value)}
-                error={Boolean(errors.productPrice)}
-                helperText={errors.productPrice}
-                required
-              />
-            )}
-          </Box>
-        );
-      case 4:
-      case 5:
-      case 8:
-        return (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <TextField
-              label="Pays"
-              value={productCountry}
-              onChange={(e) => setProductCountry(e.target.value)}
-              error={Boolean(errors.productCountry)}
-              helperText={errors.productCountry}
-              required
-            />
-          </Box>
-        );
-      case 6:
-        return (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <TextField
-              label="Email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              error={Boolean(errors.email)}
-              helperText={errors.email}
-              required
-            />
-            <TextField
-              label="Téléphone"
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              error={Boolean(errors.phone)}
-              helperText={errors.phone}
-              required
-            />
-          </Box>
-        );
-      default:
-        return 'Unknown step';
+  const fetchPlaces = useCallback(async (query) => {
+    setLoading(true);
+    setError("");
+    try {
+      const params = {
+        q: query,
+        format: "json",
+        addressdetails: 1,
+        polygon_geojson: 0,
+      };
+      const queryString = new URLSearchParams(params).toString();
+      const response = await fetch(`${NOMINATIM_BASE_URL}${queryString}`);
+      if (!response.ok) {
+        throw new Error("Une erreur s'est produite");
+      }
+      const data = await response.json();
+      setListPlace(data);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const handlePlaceSelect = (place) => {
+    setSelectPosition({
+      lat: place.lat,
+      lon: place.lon,
+      display_name: place.display_name,
+    });
+    setProductCountry(place.address.country);
+    setProductCity(place.address.city || place.address.town || place.address.village);
+    setSearchText(place.display_name);
+    setListPlace([]);
+  
+    // Clear the error message when a location is selected
+    if (place.address.country === 'France' || place.address.country === 'Morocco') {
+      setErrorMessage('');
+    } else {
+      setErrorMessage('Le service n\'est pas disponible dans ce pays');
     }
   };
 
-  return (
-    <Box sx={{ width: '100%', p: 3, display: 'flex', justifyContent: 'center' }}>
-      <Box sx={{ width: '100%', maxWidth: 800 }}>
-        <Stepper activeStep={activeStep} alternativeLabel>
-          {steps.map((label) => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
-        {activeStep === steps.length ? (
-          <Typography sx={{ mt: 2, mb: 1, textAlign: 'center' }}>
-            All steps completed - you&apos;re finished
-          </Typography>
-        ) : (
-          <Box sx={{ mt: 2 }}>
-            {getStepContent(activeStep)}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
-              <Button
-                variant="outlined"
-                color="primary"
-                disabled={activeStep === 0}
-                onClick={handleBack}
-              >
-                Back
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={activeStep === steps.length - 1 ? handleFinish : handleNext}
-              >
-                {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-              </Button>
-            </Box>
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchText(value);
+    if (value.length > 3) {
+      fetchPlaces(value);
+    } else {
+      setListPlace([]);
+    }
+  };
+  const handleImageUpload = (event) => {
+    const files = event.target.files;
+    setProductImages([...productImages, ...Array.from(files)]);
+  };
+
+  const handleRemoveImage = (index) => {
+    setProductImages(productImages.filter((_, i) => i !== index));
+  };
+  const renderSummary = () => (
+    <div>
+      <Typography variant="h6" gutterBottom>
+        Résumé de votre produit
+      </Typography>
+      <Typography><strong>Titre :</strong> {productName}</Typography>
+      <Typography><strong>Catégorie :</strong> {productCategory === 'Autres' ? customCategory : productCategory}</Typography>
+      <Typography><strong>Description :</strong> {productDescription}</Typography>
+      <Typography><strong>État :</strong> {productCondition}</Typography>
+      <Typography><strong>Prix :</strong> {donation ? 'Gratuit' : productPrice} {donation ? '' : '€'}</Typography>
+      <Typography><strong>Pays :</strong> {productCountry}</Typography>
+      <Typography><strong>Ville :</strong> {productCity}</Typography>
+      <Typography><strong>Email :</strong> {email}</Typography>
+      <Typography><strong>Téléphone :</strong> {phone}</Typography>
+      <Box mt={2}>
+        {productImages.length > 0 && (
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Images :
+            </Typography>
+            {productImages.map((image, index) => (
+              <img
+                key={index}
+                src={URL.createObjectURL(image)}
+                alt={`Preview ${index}`}
+                style={{ width: '100px', height: '100px', objectFit: 'cover', marginRight: '10px' }}
+              />
+            ))}
           </Box>
         )}
       </Box>
+    </div>
+  );
+
+  return (
+    <Box sx={{ width: '70%' }}>
+      <Stepper activeStep={activeStep} alternativeLabel>
+        {steps.map((label, index) => (
+          <Step key={index}>
+            <StepLabel>{label}</StepLabel>
+          </Step>
+        ))}
+      </Stepper>
+
+      <div>
+        {activeStep === steps.length ? (
+          <Typography variant="h5" gutterBottom>
+            Merci! Votre produit a été ajouté avec succès.
+          </Typography>
+        ) : (
+          <div>
+            {activeStep === 0 && (
+              <div>
+                <TextField
+                  label="Nom du produit"
+                  variant="outlined"
+                  fullWidth
+                  margin="normal"
+                  value={productName}
+                  onChange={(e) => setProductName(e.target.value)}
+                  error={Boolean(errors.productName)}
+                  helperText={errors.productName}
+                />
+                <TextField
+                  select
+                  label="Catégorie"
+                  variant="outlined"
+                  fullWidth
+                  margin="normal"
+                  value={productCategory}
+                  onChange={(e) => setProductCategory(e.target.value)}
+                  error={Boolean(errors.productCategory)}
+                  helperText={errors.productCategory}
+                >
+                  {categories.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                {productCategory === 'Autres' && (
+                  <TextField
+                    label="Catégorie personnalisée"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    value={customCategory}
+                    onChange={(e) => setCustomCategory(e.target.value)}
+                    error={Boolean(errors.customCategory)}
+                    helperText={errors.customCategory}
+                  />
+                )}
+                <TextField
+                  label="Description"
+                  variant="outlined"
+                  fullWidth
+                  margin="normal"
+                  multiline
+                  rows={4}
+                  value={productDescription}
+                  onChange={(e) => setProductDescription(e.target.value)}
+                  error={Boolean(errors.productDescription)}
+                  helperText={errors.productDescription}
+                />
+              </div>
+            )}
+            {activeStep === 1 && (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <input
+              accept="image/*"
+              id="product-images"
+              multiple
+              type="file"
+              style={{ display: 'none' }}
+              onChange={handleImageUpload}
+            />
+            <label htmlFor="product-images">
+              <Button variant="contained" component="span">
+                Télécharger des photos
+              </Button>
+            </label>
+            <Box mt={2}>
+              {productImages.length > 0 && (
+                <Box>
+                  {productImages.map((image, index) => (
+                    <Box key={index} sx={{ position: 'relative', display: 'inline-block', mr: 2 }}>
+                      <img
+                        src={URL.createObjectURL(image)}
+                        alt={`Preview ${index}`}
+                        style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                      />
+                      <IconButton
+                        onClick={() => handleRemoveImage(index)}
+                        sx={{ position: 'absolute', top: 0, right: 0, color: theme.palette.error.main }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
+                  ))}
+                </Box>
+              )}
+              {errors.productImages && (
+                <Typography color="error" variant="body2">
+                  {errors.productImages}
+                </Typography>
+              )}
+            </Box>
+        </Box>
+            )}
+            {activeStep === 2 && (
+              <div>
+                <TextField
+                  select
+                  label="État du produit"
+                  variant="outlined"
+                  fullWidth
+                  margin="normal"
+                  value={productCondition}
+                  onChange={(e) => setProductCondition(e.target.value)}
+                  error={Boolean(errors.productCondition)}
+                  helperText={errors.productCondition}
+                >
+                <MenuItem value="" disabled>Select condition</MenuItem>
+                <MenuItem value="Neuf">Neuf</MenuItem>
+                <MenuItem value="Comme neuf">Comme neuf</MenuItem>
+                <MenuItem value="Bon état">Bon état</MenuItem>
+                <MenuItem value="Acceptable">Acceptable</MenuItem>
+                <MenuItem value="Pour pièces">Pour pièces</MenuItem>
+                </TextField>
+              </div>
+            )}
+            {activeStep === 3 && (
+              <div>
+                <Switch
+                  checked={donation}
+                  onChange={() => setDonation(!donation)}
+                />
+                {donation ? (
+                  <Typography>Ce produit est un don.</Typography>
+                ) : (
+                  <TextField
+                    label="Prix"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    type="number"
+                    value={productPrice}
+                    onChange={(e) => setProductPrice(e.target.value)}
+                    error={Boolean(errors.productPrice)}
+                    helperText={errors.productPrice}
+                    InputProps={{
+                      startAdornment: <InputAdornment position="start">€</InputAdornment>,
+                    }}
+                  />
+                )}
+              </div>
+            )}
+{activeStep === 4 && (
+  <div>
+    <TextField
+      label="Rechercher un endroit"
+      variant="outlined"
+      fullWidth
+      margin="normal"
+      value={searchText}
+      onChange={handleSearch}
+    />
+    {loading && <Typography>Recherche en cours...</Typography>}
+    {error && <Typography color="error">{error}</Typography>}
+    {errorMessage && <Typography color="error">{errorMessage}</Typography>}
+    <List>
+      {listPlace.map((place) => (
+        <ListItem
+          button
+          key={place.place_id}
+          onClick={() => handlePlaceSelect(place)}
+        >
+          <ListItemIcon>
+            <img src={placeholderIcon} alt="location icon" width="24" height="24" />
+          </ListItemIcon>
+          <ListItemText primary={place.display_name} />
+        </ListItem>
+      ))}
+    </List>
+    <MapContainer
+      center={initialPosition}
+      zoom={5}
+      style={{ height: "400px", marginTop: "1rem" }}
+    >
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      />
+      {selectPosition && (
+        <Marker
+          position={[selectPosition.lat, selectPosition.lon]}
+          icon={icon}
+        >
+          <Popup>{selectPosition.display_name}</Popup>
+        </Marker>
+      )}
+      <ResetCenterView selectPosition={selectPosition} />
+    </MapContainer>
+  </div>
+)}
+{activeStep === 5 && (
+              <div>
+                <TextField
+                  label="Autres informations"
+                  variant="outlined"
+                  fullWidth
+                  margin="normal"
+                />
+              </div>
+            )}
+            {activeStep === 6 && (
+              <div>
+                <TextField
+                  label="Email"
+                  variant="outlined"
+                  fullWidth
+                  margin="normal"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  error={Boolean(errors.email)}
+                  helperText={errors.email}
+                />
+                {/* Phone  */}
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+              <TextField
+                select
+                label="Préfixe"
+                value={mobilePrefix}
+                onChange={(e) => setPhone(e.target.value)}
+                variant="outlined"
+                margin="normal"
+                style={{ marginRight: '1rem', width: '150px' }}
+                error={Boolean(errors.phone)}
+              >
+                <MenuItem value="+212">+212</MenuItem>
+                <MenuItem value="+33">+33</MenuItem>
+                {/* Ajoutez d'autres préfixes ici */}
+              </TextField>
+              <TextField
+                label="Numéro de téléphone"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                error={Boolean(errors.phone)}
+                helperText={errors.phone}
+              />
+            </div>
+            {/* End Phone */}
+              </div>
+            )}
+                        {activeStep === steps.length - 1 && renderSummary()} {/* Render the summary on the final step */}
+            <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+              <Button
+                color="inherit"
+                disabled={activeStep === 0}
+                onClick={handleBack}
+                sx={{ mr: 1 }}
+              >
+                Retour
+              </Button>
+              <Box sx={{ flex: '1 1 auto' }} />
+              {activeStep === steps.length - 1 ? (
+                <Button onClick={handleFinish}>Terminer</Button>
+              ) : (
+                <Button onClick={handleNext}>Suivant</Button>
+              )}
+            </Box>
+          </div>
+        )}
+      </div>
     </Box>
   );
 };

@@ -80,6 +80,7 @@ const Product = () => {
       <div className="first-informations">
         <div className="title-box">
           <p className="title">{product.name}</p>
+          <p className='title'>{product.country}</p>
         </div>
         <div className="price">
           <p>{product.price} DH</p>

@@ -1,5 +1,5 @@
 import { a as getWindow, g as getDocument } from './ssr-window.esm.mjs';
-import { a as elementParents, p as elementStyle, e as elementChildren, s as setCSSProperty, f as elementOuterSize, q as elementNextAll, r as elementPrevAll, j as getTranslate, t as animateCSSModeScroll, n as nextTick, u as showWarning, c as createElement, d as now, v as extend, h as elementIndex, w as deleteProps } from './utils.mjs';
+import { a as elementParents, p as elementStyle, e as elementChildren, s as setCSSProperty, f as elementOuterSize, q as elementNextAll, r as elementPrevAll, j as getTranslate, t as animateCSSModeScroll, n as nextTick, u as showWarning, c as createElement, v as elementIsChildOf, d as now, w as extend, h as elementIndex, x as deleteProps } from './utils.mjs';
 
 let support;
 function calcSupport() {
@@ -2191,7 +2191,7 @@ function onTouchStart(event) {
   }
   let targetEl = e.target;
   if (params.touchEventsTarget === 'wrapper') {
-    if (!swiper.wrapperEl.contains(targetEl)) return;
+    if (!elementIsChildOf(targetEl, swiper.wrapperEl)) return;
   }
   if ('which' in e && e.which === 3) return;
   if ('button' in e && e.button > 0) return;

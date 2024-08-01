@@ -77,57 +77,52 @@ app.get("/", (req, res) => {
 });
 
 /// Add Product in Listings
-app.post('/add-product', upload.array('images', 5), async (req, res) => {
-  console.log("Received Add Product request");
+app.post('/add-product', upload.array('images', 12), async (req, res) => {
+  const {
+    id,
+    name,
+    category,
+    customCategory,
+    description,
+    price,
+    donation,
+    isDon,
+    condition,
+    email,
+    phone,
+    country,
+    city,
+    userId
+  } = req.body;
 
-  const { id, name, category, customCategory, description, price, donation, isDon, country, userId, condition, email, phone } = req.body;
-  const images = req.files.map(file => file.buffer); // Store images as Buffer
+  const images = req.files.map(file => file.buffer);
 
-  console.log("Request Body:", req.body);
+  const newProduct = new Product({
+    id,
+    name,
+    category,
+    customCategory: category === 'Autres' ? customCategory : '',
+    description,
+    price: donation ? 0 : parseFloat(price),
+    donation,
+    isDon,
+    condition,
+    email,
+    phone,
+    address: {
+      country,
+      city
+    },
+    userId,
+    images
+  });
 
   try {
-    const existingProduct = await Product.findOne({ name, category, userId });
-    if (existingProduct) {
-      return res.status(400).json({ status: 'error', message: 'Product already exists!' });
-    }
-
-    const product = new Product({
-      id,
-      name,
-      category,
-      customCategory: category === 'Autres' ? customCategory : '',
-      description,
-      price,
-      donation,
-      isDon,
-      country,
-      userId,
-      condition,
-      email,
-      phone,
-      images,
-    });
-
-    console.log("New Product:", product);
-
-    const savedProduct = await product.save();
-    console.log("Saved Product:", savedProduct);
-
-    const user = await User.findById(userId);
-    console.log("User Found:", user);
-
-    if (user) {
-      user.products_to_sell.push(savedProduct._id);
-      await user.save();
-      console.log("User after adding product:", user);
-      res.send({ status: "ok", data: "Product added successfully" });
-    } else {
-      console.error("User not found:", userId);
-      res.send({ status: "error", data: "User not found" });
-    }
+    await newProduct.save();
+    res.json({ status: 'ok', message: 'Product added successfully' });
   } catch (error) {
-    console.error("Error adding product:", error);
-    res.send({ status: "error", data: error.message });
+    console.error('Error adding product:', error);
+    res.status(500).json({ status: 'error', message: 'An error occurred while adding the product' });
   }
 });
 
@@ -319,7 +314,7 @@ app.get('/users/:userId', async (req, res) => {
 // Update user details
 app.put('/users/:userId', async (req, res) => {
   const { userId } = req.params; // Changed line
-  const { name, lastName, dateOfBirth, mobile, address, postalCode, country, email, newPassword } = req.body;
+  const { name, lastName, dateOfBirth, mobile, country, postalCode, email, newPassword } = req.body;
   try {
     const user = await User.findById(userId);
     if (!user) {
@@ -330,7 +325,7 @@ app.put('/users/:userId', async (req, res) => {
     if(lastName) user.lastName = lastName;
     if (dateOfBirth) user.dateOfBirth = dateOfBirth;
     if (mobile) user.mobile = mobile;
-    if (address) user.address = address;
+    if (country) user.country = country;
     if (postalCode) user.postalCode = postalCode;
     if (country) user.country = country;
     if (email) user.email = email;
