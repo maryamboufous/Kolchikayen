@@ -4,11 +4,11 @@ const productSchema = new mongoose.Schema({
   id: { type: String, required: true },
   name: { type: String, required: true },
   category: { type: String, required: true },
-  customCategory: { type: String },  // New field for custom category
+  customCategory: { type: String },
   description: { type: String, required: true },
-  price: { type: Number },
+  price: { type: Number, required: true },
   donation: { type: Boolean, required: true },
-  isDon: { type: Boolean },
+  isDon: { type: Boolean, required: true },
   condition: { type: String, required: true },
   email: { type: String, required: true },
   phone: { type: String, required: true },
@@ -17,9 +17,9 @@ const productSchema = new mongoose.Schema({
     city: { type: String, required: true }
   },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'UserInfo', required: true },
-  images: [Buffer]
+  images: [String], // Store image URLs
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
 });
-
-productSchema.index({ name: 1, userId: 1 }, { unique: true });
 
 mongoose.model('Product', productSchema);

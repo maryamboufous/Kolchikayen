@@ -101,7 +101,7 @@ const Cart = () => {
               </div>
               <div className="cart-item-details">
                 <h3>{product.name}</h3>
-                <p>{product.price} DH</p>
+                <p>{product.price} €</p>
 
                 <button className="btn btn-danger" onClick={navigateToBuy}>Acheter</button>
 

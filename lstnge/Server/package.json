@@ -5,15 +5,17 @@
   "main": "Server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.0.1",
+    "cloudinary": "^1.41.3",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "mongoose": "^5.13.13",
-    "cors": "^2.8.5",
-    "bcrypt": "^5.0.1"
+    "multer-storage-cloudinary": "^4.0.0"
   }
 }

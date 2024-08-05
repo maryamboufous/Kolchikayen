@@ -7,17 +7,26 @@ const bcrypt = require('bcrypt');
 const cors = require('cors');
 const path = require('path');
 const multer = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const axios = require('axios');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const cloudinary = require('cloudinary').v2;
 
-const mongoUrl = 'mongodb+srv://maryam:Merybouf123@cluster0.najmn7n.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-mongoose.connect(mongoUrl).then(() => {
-  console.log("Database Connected");
-}).catch((e) => {
-  console.error("Database Connection Error: ", e);
-});
+const dbURI = 'mongodb://maryam:Merybouf123@ac-qxsgsof-shard-00-01.najmn7n.mongodb.net:27017,ac-qxsgsof-shard-00-00.najmn7n.mongodb.net:27017,ac-qxsgsof-shard-00-02.najmn7n.mongodb.net:27017/?authSource=admin&replicaSet=atlas-znq6hh-shard-0&retryWrites=true&w=majority&appName=Cluster0&ssl=true';
 
+mongoose.connect(dbURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+  useFindAndModify: false,
+  writeConcern: {
+    w: 'majority',
+    wtimeout: 5000
+  }
+})
+  .then(() => console.log('Database Connected'))
+  .catch((err) => console.error('Database connection error:', err));
 require('./userDetails');
 require('./ProductDetails');
 require('./LikedProduct');
@@ -65,17 +74,28 @@ app.post('/send-verification-code', async (req, res) => {
     res.status(200).json({ status: 'ok', data: { verificationCode } });
   });
 });
-// Uploades Images from Form:
-const storage = multer.memoryStorage(); // Change to memory storage
+// Cloudinary configuration
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'koulchikayn', // Folder name in Cloudinary
+    format: async (req, file) => 'jpeg', // supports promises as well
+    public_id: (req, file) => `${Date.now()}-${file.originalname}`,
+  },
+});
+
 const upload = multer({ storage: storage });
-
-
 
 // Start App
 app.get("/", (req, res) => {
   res.send({ status: "started" });
 });
-
 /// Add Product in Listings
 app.post('/add-product', upload.array('images', 12), async (req, res) => {
   const {
@@ -95,7 +115,7 @@ app.post('/add-product', upload.array('images', 12), async (req, res) => {
     userId
   } = req.body;
 
-  const images = req.files.map(file => file.buffer);
+  const images = req.files.map(file => file.path); // Get the image URLs from Cloudinary
 
   const newProduct = new Product({
     id,
@@ -103,7 +123,7 @@ app.post('/add-product', upload.array('images', 12), async (req, res) => {
     category,
     customCategory: category === 'Autres' ? customCategory : '',
     description,
-    price: donation ? 0 : parseFloat(price),
+    price,
     donation,
     isDon,
     condition,
@@ -114,7 +134,7 @@ app.post('/add-product', upload.array('images', 12), async (req, res) => {
       city
     },
     userId,
-    images
+    images // Save image URLs
   });
 
   try {
@@ -148,6 +168,7 @@ app.get('/products/category/:category', async (req, res) => {
 
 
 // Serve images directly from MongoDB
+
 app.get('/product-image/:productId/:imageIndex', async (req, res) => {
   const { productId, imageIndex } = req.params;
   try {
@@ -155,12 +176,12 @@ app.get('/product-image/:productId/:imageIndex', async (req, res) => {
     if (!product || !product.images[imageIndex]) {
       return res.status(404).send('Image not found');
     }
-    res.set('Content-Type', 'image/jpeg');
-    res.send(product.images[imageIndex]);
+    res.redirect(product.images[imageIndex]); // Redirect to Cloudinary image URL
   } catch (error) {
     res.status(500).json({ status: 'error', message: 'Internal server error' });
   }
 });
+
 
 
 // Get all products
@@ -263,39 +284,84 @@ app.delete('/products/products/:id', async(req, res) =>{
     res.status(500).send('Server error');
   }
 });
-
-// Edit Product
-app.put('/edit-product/:id', upload.array('images', 5), async (req, res) => {
-  const productId = req.params.id;
-  const { name, category, description, price, isAvailable, country, userId } = req.body;
-  const images = req.files.map(file => file.buffer); // Store images as Buffer
+//edit
+app.put('/edit-product/:productId', upload.array('images', 12), async (req, res) => {
+  const { productId } = req.params;
+  const {
+    name,
+    category,
+    customCategory,
+    description,
+    price,
+    donation,
+    country,
+    city,
+    userId,
+    condition,
+    email,
+    phone,
+    existingImages
+  } = req.body;
+  const images = req.files;
 
   try {
-    const product = await Product.findById(productId);
-
-    if (!product) {
-      return res.status(404).json({ status: 'error', message: 'Product not found!' });
+    // Retrieve the existing product
+    console.log('Fetching existing product...');
+    const existingProduct = await Product.findById(productId);
+    if (!existingProduct) {
+      console.log('Product not found');
+      return res.status(404).json({ status: 'error', message: 'Product not found' });
     }
 
-    if (product.userId.toString() !== userId) {
-      return res.status(403).json({ status: 'error', message: 'Unauthorized!' });
+    // Parse existingImages if provided
+    let updatedImages = [];
+    if (existingImages) {
+      try {
+        updatedImages = JSON.parse(existingImages);
+      } catch (error) {
+        console.log('Invalid JSON format for existingImages:', error);
+        return res.status(400).json({ status: 'error', message: 'Invalid JSON format for existingImages' });
+      }
     }
 
-    if (name) product.name = name;
-    if (category) product.category = category;
-    if (description) product.description = description;
-    if (price) product.price = price;
-    if (isAvailable !== undefined) product.isAvailable = isAvailable;
-    if (country) product.country = country;
-    if (images.length > 0) product.images = images;
+    // Combine existing images with new uploads
+    if (images) {
+      images.forEach(file => {
+        console.log('Adding new image:', file.path);
+        updatedImages.push(file.path);
+      });
+    }
 
-    await product.save();
-    res.send({ status: 'ok', data: 'Product updated successfully' });
+    const updatedFields = {
+      name,
+      category,
+      customCategory: category === 'Autres' ? customCategory : '',
+      description,
+      price: donation === 'true' ? 0 : parseFloat(price),
+      donation: donation === 'true',
+      country,
+      city,
+      condition,
+      email,
+      phone,
+      userId,
+      updatedAt: Date.now(),
+      images: updatedImages
+    };
+
+    console.log('Updating product with fields:', updatedFields);
+    const updatedProduct = await Product.findByIdAndUpdate(productId, updatedFields, { new: true });
+
+    console.log('Product updated successfully.');
+    res.json({ status: 'ok', product: updatedProduct });
   } catch (error) {
     console.error('Error updating product:', error);
-    res.status(500).send({ status: 'error', data: error.message });
+    res.status(500).json({ status: 'error', message: 'An error occurred while updating the product' });
   }
 });
+
+
+
 //uuser infos are done i guess 
 // Get user by ID
 app.get('/users/:userId', async (req, res) => {

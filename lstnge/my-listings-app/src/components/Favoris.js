@@ -97,7 +97,7 @@ const Favoris = () => {
                   />
                   <div className="favoris-item-details">
                     <h3>{product.name}</h3>
-                    <p>{product.price} DH</p>
+                    <p>{product.price} €</p>
                     <p>
                       <small className="text-muted">Publié par {product.userId ? product.userId.name : 'Unknown'}</small>
                     </p>

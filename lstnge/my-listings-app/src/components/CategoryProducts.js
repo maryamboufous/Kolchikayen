@@ -37,7 +37,7 @@ const CategoryProducts = () => {
               <Link to={`/Product/${product._id}`} className="btntoprod">
                 <img src={`http://localhost:5001/product-image/${product._id}/0`} alt={product.name} />
                 <h3>{product.name}</h3>
-                <p>{product.price} DH</p>
+                <p>{product.price} €</p>
                 <p>{product.description}</p>
               </Link>
             </div>

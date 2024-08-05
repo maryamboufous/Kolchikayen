@@ -199,7 +199,7 @@ const AddProductForm = () => {
   const handleFinish = async () => {
     if (validateStep()) {
       await handleAddProduct();
-      navigate('/Home');
+      navigate('/store');
     }
   };
 
@@ -224,7 +224,7 @@ const AddProductForm = () => {
     formData.append('userId', userId);
     formData.append('condition', productCondition);
     formData.append('email', email);
-    formData.append('phone', phone);
+    formData.append('phone', `${mobilePrefix} ${phone}`);
 
     for (let i = 0; i < productImages.length; i++) {
       formData.append('images', productImages[i]);
@@ -313,11 +313,33 @@ const AddProductForm = () => {
       setListPlace([]);
     }
   };
-  const handleImageUpload = (event) => {
-    const files = event.target.files;
-    setProductImages([...productImages, ...Array.from(files)]);
+  const handleImageUpload = async (imageFile) => {
+    const formData = new FormData();
+    formData.append('file', imageFile);
+    formData.append('upload_preset', 'koulchikayn'); // Replace with your Cloudinary preset
+  
+    try {
+      const response = await fetch('https://api.cloudinary.com/v1_1/ds4qhqy8k/image/upload', {
+        method: 'POST',
+        body: formData,
+      });
+  
+      const data = await response.json();
+      console.log(data); // Inspect the response data
+      if (response.ok) {
+        console.log('Image uploaded successfully:', data.url);
+        // Update productImages state with the uploaded image URL
+        setProductImages(prevImages => [...prevImages, data.secure_url]);
+      } else {
+        console.error('Upload failed:', data.error.message);
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+    }
   };
-
+  
+  
+  
   const handleRemoveImage = (index) => {
     setProductImages(productImages.filter((_, i) => i !== index));
   };
@@ -427,49 +449,54 @@ const AddProductForm = () => {
                 />
               </div>
             )}
-            {activeStep === 1 && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <input
-              accept="image/*"
-              id="product-images"
-              multiple
-              type="file"
-              style={{ display: 'none' }}
-              onChange={handleImageUpload}
-            />
-            <label htmlFor="product-images">
-              <Button variant="contained" component="span">
-                Télécharger des photos
-              </Button>
-            </label>
-            <Box mt={2}>
-              {productImages.length > 0 && (
-                <Box>
-                  {productImages.map((image, index) => (
-                    <Box key={index} sx={{ position: 'relative', display: 'inline-block', mr: 2 }}>
-                      <img
-                        src={URL.createObjectURL(image)}
-                        alt={`Preview ${index}`}
-                        style={{ width: '100px', height: '100px', objectFit: 'cover' }}
-                      />
-                      <IconButton
-                        onClick={() => handleRemoveImage(index)}
-                        sx={{ position: 'absolute', top: 0, right: 0, color: theme.palette.error.main }}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Box>
-                  ))}
-                </Box>
-              )}
-              {errors.productImages && (
-                <Typography color="error" variant="body2">
-                  {errors.productImages}
-                </Typography>
-              )}
+{activeStep === 1 && (
+  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <input
+      accept="image/*"
+      id="product-images"
+      multiple
+      type="file"
+      style={{ display: 'none' }}
+      onChange={(e) => {
+        const files = Array.from(e.target.files);
+        setProductImages((prevImages) => [...prevImages, ...files]);
+        files.forEach(file => handleImageUpload(file));
+      }}
+    />
+    <label htmlFor="product-images">
+      <Button variant="contained" component="span">
+        Télécharger des photos
+      </Button>
+    </label>
+    <Box mt={2}>
+      {productImages.length > 0 && (
+        <Box>
+          {productImages.map((image, index) => (
+            <Box key={index} sx={{ position: 'relative', display: 'inline-block', mr: 2 }}>
+              <img
+                src={URL.createObjectURL(image)}
+                alt={`Preview ${index}`}
+                style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+              />
+              <IconButton
+                onClick={() => handleRemoveImage(index)}
+                sx={{ position: 'absolute', top: 0, right: 0, color: theme.palette.error.main }}
+              >
+                <DeleteIcon />
+              </IconButton>
             </Box>
+          ))}
         </Box>
-            )}
+      )}
+      {errors.productImages && (
+        <Typography color="error" variant="body2">
+          {errors.productImages}
+        </Typography>
+      )}
+    </Box>
+  </Box>
+)}
+
             {activeStep === 2 && (
               <div>
                 <TextField
@@ -553,7 +580,7 @@ const AddProductForm = () => {
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      />
+        />
       {selectPosition && (
         <Marker
           position={[selectPosition.lat, selectPosition.lon]}

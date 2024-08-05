@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { UserContext } from '../context/UserContext';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import './Store.css';
 
 const Store = () => {
   const { user } = useContext(UserContext);
   const [products, setProducts] = useState([]);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const location = useLocation();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -21,7 +23,13 @@ const Store = () => {
     if (user) {
       fetchProducts();
     }
-  }, [user]);
+  }, [user, refreshKey]);
+
+  useEffect(() => {
+    if (location.state?.refresh) {
+      setRefreshKey(prevKey => prevKey + 1);
+    }
+  }, [location.state]);
 
   const deleteProduct = async (productId) => {
     try {
@@ -45,12 +53,15 @@ const Store = () => {
       <div className="product-list">
         {products.map((product) => (
           <div className="product-item" key={product._id}>
-          <Link to={`/Product/${product._id}`} className="btntoprod">
-            <img src={`http://localhost:5001/product-image/${product._id}/0`}  alt={product.name} />
+            <Link to={`/Product/${product._id}`} className="btntoprod">
+              <img
+                src={`http://localhost:5001/product-image/${product._id}/0?refresh=${refreshKey}`}
+                alt={product.name}
+              />
             </Link>
             <div className="product-details">
               <h3>{product.name}</h3>
-              <p>{product.price} DH</p>
+              <p>{product.price} €</p>
               <button className="delete-btn" onClick={() => deleteProduct(product._id)}>Delete</button>
               <Link to={`/edit-product/${product._id}`} className="edit-btn">Edit</Link>
             </div>

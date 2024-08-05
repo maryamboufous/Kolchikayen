@@ -83,7 +83,7 @@ const Product = () => {
           <p className='title'>{product.country}</p>
         </div>
         <div className="price">
-          <p>{product.price} DH</p>
+          <p>{product.price} €</p>
         </div>
         <div className="title-box">
           <p className="title">{product.category}</p>

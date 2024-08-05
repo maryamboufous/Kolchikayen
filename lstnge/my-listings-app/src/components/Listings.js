@@ -69,13 +69,13 @@ const Listings = () => {
     <div className="listings">
       <h1>Liste des Produits</h1>
       <div className="listing-items">
-        {products.map((product) => (
+        {Array.isArray(products) && products.map((product) => (
           <div className="listing-item" key={product._id}>
             <Link to={`/Product/${product._id}`} className="btntoprod">
-              <img src={`http://localhost:5001/product-image/${product._id}/0`} alt={product.name} />
+              <img src={product.images[0]} alt={product.name} />
               <div className="listing-details">
                 <h3>{product.name}</h3>
-                <p>{product.price} DH</p>
+                <p>{product.price} €</p>
                 <p>
                   <small className="text-muted">Publié par {product.userId ? product.userId.name : 'Unknown'}</small>
                 </p>
@@ -84,9 +84,7 @@ const Listings = () => {
             <div className="heart-icon" onClick={() => toggleLike(product._id)}>
               <img src={likedProducts.includes(product._id) ? heartLike : heartEmpty} alt="like button" />
             </div>
-            <button className='btn btn-info' onClick={() => addToCart(product._id)}>
-              Ajouter au panier
-            </button>
+            <button onClick={() => addToCart(product._id)}>Add to Cart</button>
           </div>
         ))}
       </div>
