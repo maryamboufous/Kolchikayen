@@ -267,3 +267,68 @@
   font-size: larger;
 }
 
+/* Add this to your existing Uppernav.css */
+
+/* Updated styling for the search area */
+.nav-search {
+  display: flex;
+  align-items: center;
+  margin: 0 20px;
+}
+
+.searchholder {
+  background-color: rgb(238, 236, 236);
+  padding: 4px 8px; /* Increased padding for better appearance */
+  border-radius: 5px;
+  width: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Adjust alignment for better spacing */
+  border: 1px solid #ccc; /* Add border for better definition */
+}
+
+.searchholder input {
+  border: none;
+  background-color: transparent;
+  flex-grow: 1; /* Allow input to take more space */
+  margin-left: 5px; /* Add margin for separation from the search icon */
+}
+
+.searchholder input:focus {
+  outline: none;
+}
+
+.search-button {
+  background-color: transparent; /* Remove background for cleaner look */
+  border: none;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.categoriess {
+  background-color: #ccc;
+  border: none;
+  padding: 5px 10px;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.search-results {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  max-height: 200px;
+  overflow-y: auto;
+  width: 10%;
+  z-index: 100;
+  top: 9%;
+}
+
+.search-result-item {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.search-result-item:hover {
+  background-color: #f0f0f0;
+}

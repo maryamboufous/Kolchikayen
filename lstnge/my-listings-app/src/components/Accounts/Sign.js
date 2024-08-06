@@ -6,8 +6,6 @@ import { FaArrowLeft } from 'react-icons/fa';
 import './Sign.css';
 
 const SignIn = () => {
-  const [step, setStep] = useState(1);
-  const [accountType, setAccountType] = useState('');
   const [name, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [mobile, setMobile] = useState('');
@@ -16,15 +14,16 @@ const SignIn = () => {
   const [verificationCode, setVerificationCode] = useState('');
   const [errors, setErrors] = useState({});
   const [serverVerificationCode, setServerVerificationCode] = useState(null);
+  const [step, setStep] = useState(2); // Start from the second step
   const navigate = useNavigate();
   const { setUser } = useContext(UserContext);
 
-  const validateStep2 = () => {
+  const validateStep2 = async () => {
     const newErrors = {};
     if (name.length < 3) {
       newErrors.name = 'Le nom d\'utilisateur doit comporter plus de 3 lettres.';
     }
-    const mobilePattern = mobilePrefix === '+212' ? /^[0-9]{9}$/ : /^[0-9]{10}$/;
+    const mobilePattern = mobilePrefix === '+212' ? /^[0-9]{9,10}$/ : /^[0-9]{9,10}$/;
     if (!mobilePattern.test(mobile)) {
       newErrors.mobile = 'Numéro de téléphone invalide.';
     }
@@ -35,20 +34,36 @@ const SignIn = () => {
     if (!passwordPattern.test(password)) {
       newErrors.password = 'Le mot de passe doit comporter entre 8 et 50 caractères, avec au moins une lettre minuscule, une lettre majuscule et un chiffre.';
     }
+
+    // Check if email already exists
+    try {
+      const response = await fetch('http://localhost:5001/check-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+      const data = await response.json();
+      if (data.exists) {
+        newErrors.email = 'L\'adresse e-mail existe déjà.';
+      }
+    } catch (error) {
+      console.error(`Error: ${error}`);
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleNextStep = () => {
-    if (step === 1 && accountType) {
-      setStep(2);
-    } else if (step === 2 && validateStep2()) {
+  const handleNextStep = async () => {
+    if (await validateStep2()) {
       sendVerificationCode();
     }
   };
 
   const handlePreviousStep = () => {
-    if (step > 1) {
+    if (step > 2) {
       setStep(step - 1);
     }
   };
@@ -109,35 +124,8 @@ const SignIn = () => {
   return (
     <div className="auth-form">
       <h2>Inscription</h2>
-      {step === 1 && (
-        <div>
-          <h3>Compte pour :</h3>
-          <label>
-            <input
-              type="radio"
-              name="accountType"
-              value="Moi"
-              checked={accountType === 'Moi'}
-              onChange={(e) => setAccountType(e.target.value)}
-            />
-            Moi
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="accountType"
-              value="Mon entreprise"
-              checked={accountType === 'Mon entreprise'}
-              onChange={(e) => setAccountType(e.target.value)}
-            />
-            Mon entreprise
-          </label>
-          <button onClick={handleNextStep} disabled={!accountType}>Suivant</button>
-        </div>
-      )}
       {step === 2 && (
         <div>
-          <button onClick={handlePreviousStep}><FaArrowLeft /></button>
           <form onSubmit={handleSubmit}>
             <div>
               <label>Nom d'utilisateur:</label>
@@ -208,10 +196,7 @@ const SignIn = () => {
           </form>
         </div>
       )}
-      <div className="auth-google">
-        <img src={googleimg} alt="Google" />
-        <span>Continuer avec Google</span>
-      </div>
+
     </div>
   );
 };

@@ -18,9 +18,11 @@ const Profile = () => {
     newPassword: '',
     confirmPassword: '',
     announcements: [],
+    profileImage: ''
   });
 
   const [loading, setLoading] = useState(true);
+  const [profileImageFile, setProfileImageFile] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -58,6 +60,10 @@ const Profile = () => {
     }));
   };
 
+  const handleProfileImageChange = (e) => {
+    setProfileImageFile(e.target.files[0]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (userData.newPassword !== userData.confirmPassword) {
@@ -93,18 +99,50 @@ const Profile = () => {
     } catch (error) {
       console.error('Error updating profile:', error);
     }
+
+    if (profileImageFile) {
+      const formData = new FormData();
+      formData.append('profileImage', profileImageFile);
+      formData.append('userId', user._id);
+
+      try {
+        const response = await fetch('http://localhost:5001/upload-profile-image', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await response.json();
+        if (data.status === 'ok') {
+          setUserData((prevData) => ({
+            ...prevData,
+            profileImage: data.user.profileImage,
+          }));
+          alert('Profile image updated successfully');
+        } else {
+          console.error(data.message);
+        }
+      } catch (error) {
+        console.error('Error uploading profile image:', error);
+      }
+    }
   };
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
-
   return (
     <div className="container">
       <h1>Profile</h1>
       {userData ? (
         <div className="profileHeader">
+          <div className="profileImage">
+            {userData.profileImage ? (
+              <img src={userData.profileImage} alt="Profile" />
+            ) : (
+              <div className="placeholderImage">No Image</div>
+            )}
+          </div>
           <form onSubmit={handleSubmit}>
             <div className="profileField">
               <label>Nom:</label>
@@ -198,23 +236,16 @@ const Profile = () => {
                 onChange={handleInputChange}
               />
             </div>
+            <div className="profileField">
+              <label>Profile Image:</label>
+              <input type="file" name="profileImage" onChange={handleProfileImageChange} />
+            </div>
             <button type="submit">Mettre à jour</button>
           </form>
         </div>
       ) : (
         <div>Loading...</div>
       )}
-
-      <h2 className="sectionTitle">Annonces</h2>
-      {/* <div className="announcementList">
-        {userData && userData.announcements ? (
-          userData.announcements.map((announcement) => (
-            <div key={announcement.id}>{announcement.title}</div>
-          ))
-        ) : (
-          <div>No announcements found.</div>
-        )}
-      </div> */}
     </div>
   );
 };

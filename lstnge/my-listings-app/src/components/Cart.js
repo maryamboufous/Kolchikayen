@@ -75,8 +75,8 @@ const Cart = () => {
   };
 
   const navigateToBuy =() =>{
-    navigate('/Buy');
-  }
+    navigate(`/Buy/${productId}`);  };
+
 
   return (
     <div className="cart">

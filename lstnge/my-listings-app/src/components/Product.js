@@ -8,13 +8,14 @@ import userimg from '../assets/user-img.webp';
 import whatsappimg from '../assets/whatsapp.svg';
 import messageimg from '../assets/message.svg';
 import phoneimg from '../assets/phone.svg';
+import heartEmpty from '../assets/heart_empty.png';
+import heartLike from '../assets/like.png';
 
 const Product = () => {
   const { productId } = useParams();
   const [product, setProduct] = useState(null);
   const navigate = useNavigate();
-  const { user,cartItemCount, setCartItemCount } = useContext(UserContext);
-
+  const { user, cartItemCount, setCartItemCount, likedProducts, setLikedProducts } = useContext(UserContext);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -35,7 +36,7 @@ const Product = () => {
   }, [productId]);
 
   const navigateToProfile = (userId) => {
-    navigate(`/Profile/${userId}`);
+    navigate(``);
   };
 
   const addToCart = async (productId) => {
@@ -58,9 +59,36 @@ const Product = () => {
     }
   };
 
-  const navigateToBuy =() =>{
-    navigate('/Buy');
-  }
+  const navigateToBuy = () => {
+    navigate(`/Buy/${productId}`);  };
+
+  const toggleLike = async (productId) => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    const isLiked = likedProducts.includes(productId);
+
+    try {
+      const response = await fetch(`http://localhost:5001/${isLiked ? 'unlike' : 'like'}-product`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: user._id, productId }),
+      });
+
+      const data = await response.json();
+      if (data.status === 'ok') {
+        setLikedProducts((prevLikedProducts) =>
+          isLiked ? prevLikedProducts.filter((id) => id !== productId) : [...prevLikedProducts, productId]
+        );
+      }
+    } catch (error) {
+      console.error('Error toggling like:', error);
+    }
+  };
 
   if (!product) {
     return <div>Loading...</div>;
@@ -68,15 +96,11 @@ const Product = () => {
 
   return (
     <div className="Product_container">
-      <div className="Product_slider">
-        <Swiper spaceBetween={50} slidesPerView={1}>
+        <div className="product-images">
           {product.images.map((image, index) => (
-            <SwiperSlide key={index}>
-              <img src={`http://localhost:5001/product-image/${product._id}/0`} alt={product.name} />
-            </SwiperSlide>
+            <img key={index} src={image} alt={`Product ${index}`} />
           ))}
-        </Swiper>
-      </div>
+        </div>
       <div className="first-informations">
         <div className="title-box">
           <p className="title">{product.name}</p>
@@ -104,10 +128,12 @@ const Product = () => {
           <a href="#"><img src={phoneimg} alt="Phone" /></a>
         </div>
         <button className='btn btn-info' onClick={() => addToCart(product._id)}>
-              Ajouter au panier
-            </button>
-          <button className="btn btn-danger" onClick={navigateToBuy}>Acheter</button>
-
+          Ajouter au panier
+        </button>
+        <button className="btn btn-danger" onClick={navigateToBuy}>Acheter</button>
+        <div className="heart-icon" onClick={() => toggleLike(product._id)}>
+          <img src={likedProducts.includes(product._id) ? heartLike : heartEmpty} alt="like button" />
+        </div>
       </div>
       <div className="third-informations">
         <h1>Description</h1>

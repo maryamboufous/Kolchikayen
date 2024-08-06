@@ -62,7 +62,7 @@ const navigateToSignUp = () =>{
           />
         </div>
         <button type="submit">Connexion</button>
-        <a onClick={navigateToSignUp}>Creer un compte</a>
+        <a onClick={navigateToSignUp}>Créer un compte</a>
       </form>
     </div>
   );

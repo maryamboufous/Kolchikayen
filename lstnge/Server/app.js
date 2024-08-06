@@ -62,7 +62,7 @@ app.post('/send-verification-code', async (req, res) => {
     from: process.env.EMAIL_USER,
     to: email,
     subject: 'Your Verification Code',
-    text: `Your verification of Kolchikayn App code is: ${verificationCode}`,
+    text: `Votre code de verification de l'Application Kolchikayn est : ${verificationCode}`,
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
@@ -165,7 +165,24 @@ app.get('/products/category/:category', async (req, res) => {
     res.status(500).json({ status: 'error', message: 'Error fetching products' });
   }
 });
+//User profile image
+app.post('/upload-profile-image', upload.single('profileImage'), async (req, res) => {
+  const { userId } = req.body;
+  const profileImage = req.file.path;
 
+  try {
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { profileImage },
+      { new: true }
+    );
+
+    res.json({ status: 'ok', user });
+  } catch (error) {
+    console.error('Error uploading profile image:', error);
+    res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+});
 
 // Serve images directly from MongoDB
 
@@ -361,6 +378,21 @@ app.put('/edit-product/:productId', upload.array('images', 12), async (req, res)
 });
 
 
+// Get products by country
+app.get('/products/country/:country', async (req, res) => {
+  const { country } = req.params;
+  console.log(`Fetching products for country: ${country}`);
+
+  try {
+    const products = await Product.find({ 'address.country': country }).populate('userId', 'name');
+    console.log(`Products found: ${products.length}`);
+    res.status(200).json({ status: 'ok', products });
+  } catch (error) {
+    console.error('Error fetching products by country:', error);
+    res.status(500).json({ status: 'error', message: 'Error fetching products' });
+  }
+});
+
 
 //uuser infos are done i guess 
 // Get user by ID
@@ -436,6 +468,21 @@ app.get('/products/user/:userId', async (req, res) => {
     res.status(500).json({ message: 'Error fetching user products', error });
   }
 });
+// Search products by name
+app.get('/search', async (req, res) => {
+  const { query } = req.query; // Read the query parameter from the request
+  try {
+    const products = await Product.find({
+      name: { $regex: query, $options: 'i' } // Case-insensitive match
+    });
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+});
+
+
+
 // Add Product to Cart
 app.post('/add-to-cart', async (req, res) => {
   const { userId, productId } = req.body;
@@ -504,6 +551,17 @@ app.delete('/user/:userId/cart-products/:productId', async (req, res) => {
   } catch (error) {
     console.error('Error removing product from cart:', error);
     res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+});
+// Check if email exists
+app.post('/check-email', async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    res.status(200).json({ exists: !!user });
+  } catch (error) {
+    console.error("Error checking email: ", error);
+    res.status(500).json({ status: 'error', data: error.message });
   }
 });
 // Sign Up

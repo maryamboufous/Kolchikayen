@@ -1,12 +1,9 @@
-// src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Home from './components/Home';
 import Login from './components/Accounts/Login';
 import Sign from './components/Accounts/Sign';
 import AllCats from './components/AllCats';
-import FranceListings from './components/FranceListings';
-import MoroListings from './components/MoroListings';
 import Product from './components/Product';
 import Profile from './components/Profile';
 import AddProductForm from './components/AddProductForm';
@@ -17,6 +14,7 @@ import EditProduct from './components/EditProduct';
 import CategoryProducts from './components/CategoryProducts';
 import Cart from './components/Cart';
 import Buy from './components/Buy';
+import CountryListings from './components/CountryListings';
 import { UserProvider } from './context/UserContext';
 import { CountryProvider } from './context/CountryContext';
 import Uppernav from './components/Uppernav';
@@ -42,13 +40,12 @@ const App = () => {
             <Route path="/Home" element={<Home />} />
             <Route path="/login" element={<RouteGuard><Login /></RouteGuard>} />
             <Route path="/signup" element={<RouteGuard><Sign /></RouteGuard>} />
-            <Route path="/France" element={<FranceListings />} />
-            <Route path="/Morroco" element={<MoroListings />} />
+            <Route path="/country/:country" element={<CountryListings />} />
             <Route path="/Product/:productId" element={<Product />} />
             <Route path="/Profile" element={<RouteGuard><Profile /></RouteGuard>} />
             <Route path="/Favoris" element={<RouteGuard><Favoris /></RouteGuard>} />
             <Route path="/Cart" element={<RouteGuard><Cart /></RouteGuard>} />
-            <Route path="/Buy" element={<RouteGuard><Buy /></RouteGuard>} />
+            <Route path="/Buy/:productId" element={<RouteGuard><Buy /></RouteGuard>} />
             <Route path="/" element={<Home />} />
             <Route path="/Messages" element={<RouteGuard><Messages /></RouteGuard>} />
             <Route path="/Allcategories" element={<AllCats />} />

@@ -60,6 +60,7 @@ const Categories = () => {
             </div>
           ))}
         </div>
+        <h1></h1>
         {currentSlide > 0 && (
           <button className="slider-btn prev" onClick={goToPrevSlide}>
             <FaChevronLeft />

@@ -1,115 +1,144 @@
 .Product_container {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    min-height: 87vh;
-  }
-  
-  .Product_slider {
-    width: 56%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .Product_slider img {
-    width: 100%;
-  }
-  
-  .first-informations {
-    width: 75%;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    margin-top: 20px;
-  }
-  
-  .title-box {}
-  
-  .title {
-    font-size: 35px;
-  }
-  
-  .price {
-    font-size: 35px;
-    color: green;
-  }
-  
-  .seller-informations {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    flex-direction: row;
-    width: 75%;
-    margin-top: 20px;
-  }
-  
-  .seller-img {}
-  
-  .seller-img img {
-    width: 90px;
-    border-radius: 9999px;
-    cursor: pointer;
-  }
-  
-  .contact-info {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-  }
-  
-  .contact-info img {
-    width: 50px;
-    cursor: pointer;
-  }
-  
-  .third-informations {
-    width: 75%;
-    margin-top: 20px;
-  }
-  
-  .third-informations h1 {
-    font-size: 40px;
-  }
-  
-  .third-informations p {
-    font-size: 20px;
-  }
-  
-  .clickable {
-    color: green;
-    cursor: pointer;
-  }
-  
-  @media (max-width: 768px) {
-    .Product_slider {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .first-informations {
-      width: 90%;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      flex-direction: column;
-    }
-  
-    .contact-info img {
-      width: 40px;
-    }
-  
-    .seller-informations {
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-      flex-direction: row;
-      width: 90%;
-    }
-  }
-  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: #f5f5f5;
+}
+
+.Product_slider {
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 20px;
+}
+
+
+.first-informations {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 20px;
+}
+
+.title-box {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.price {
+  font-size: 20px;
+  font-weight: bold;
+  color: #d32f2f;
+}
+
+.seller-informations {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 20px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.seller-img {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.seller-img img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-left: 10px;
+}
+
+.contact-info {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.contact-info a {
+  margin: 0 10px;
+}
+
+.contact-info img {
+  width: 30px;
+  height: 30px;
+}
+
+.btn {
+  padding: 10px 20px;
+  margin: 5px 0;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-info {
+  background-color: #1976d2;
+  color: #fff;
+}
+
+.btn-danger {
+  background-color: #d32f2f;
+  color: #fff;
+}
+
+.third-informations {
+  width: 100%;
+  max-width: 600px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.third-informations h1 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.third-informations p {
+  font-size: 16px;
+  line-height: 1.5;
+}
+.heart-icon {
+  position: absolute;
+  top: 20%;
+  left: 14%; /* Changed to left */
+  width: 30px; /* Increased size for better fit */
+  height: 32px;
+  cursor: pointer;
+  background-color: white;
+  border-radius: 50%;
+  padding: 4px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heart-icon img {
+  width: 20px; 
+  height: 20px; 
+}

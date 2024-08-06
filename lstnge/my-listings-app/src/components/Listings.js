@@ -1,13 +1,15 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { UserContext } from '../context/UserContext';
+import { Link, useNavigate } from 'react-router-dom';
+import moment from 'moment';
 import './Listings.css';
-import { Link } from 'react-router-dom';
 import heartEmpty from '../assets/heart_empty.png';
 import heartLike from '../assets/like.png';
 
 const Listings = () => {
   const [products, setProducts] = useState([]);
   const { user, cartItemCount, setCartItemCount, likedProducts, setLikedProducts } = useContext(UserContext);
+  const navigate = useNavigate();
 
   const fetchProducts = async () => {
     try {
@@ -24,6 +26,11 @@ const Listings = () => {
   }, [user]);
 
   const toggleLike = async (productId) => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
     const isLiked = likedProducts.includes(productId);
 
     try {
@@ -78,6 +85,9 @@ const Listings = () => {
                 <p>{product.price} €</p>
                 <p>
                   <small className="text-muted">Publié par {product.userId ? product.userId.name : 'Unknown'}</small>
+                </p>
+                <p>
+                  <small className="text-muted">Ajouté il y a {moment(product.createdAt).fromNow()}</small>
                 </p>
               </div>
             </Link>

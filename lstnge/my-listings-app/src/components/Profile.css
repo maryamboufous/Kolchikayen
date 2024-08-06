@@ -2,25 +2,47 @@
 
 .container {
   padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .profileHeader {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 20px;
   margin-bottom: 20px;
 }
 
-.profilePicture {
+.profileImage img {
   width: 100px;
   height: 100px;
   border-radius: 50%;
+  object-fit: cover;
+}
+
+.placeholderImage {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: white;
 }
 
 form {
   display: flex;
   flex-direction: column;
   gap: 15px;
+  width: 100%;
 }
 
 form div {

@@ -92,7 +92,7 @@ const AddProductForm = () => {
 
   const categories = [
     'Immobilier',
-    'Vehicules',
+    'véhicules',
     'Telephones',
     'Ordinateurs',
     'Motos',
@@ -297,7 +297,7 @@ const AddProductForm = () => {
     setListPlace([]);
   
     // Clear the error message when a location is selected
-    if (place.address.country === 'France' || place.address.country === 'Morocco') {
+    if (place.address.country === 'France' || place.address.country === 'Morocco' || place.address.country === 'Maroc') {
       setErrorMessage('');
     } else {
       setErrorMessage('Le service n\'est pas disponible dans ce pays');

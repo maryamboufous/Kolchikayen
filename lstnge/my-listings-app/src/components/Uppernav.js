@@ -1,17 +1,17 @@
+// Import necessary hooks and functions
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../context/UserContext';
-import { useCountry } from '../context/CountryContext';
 import { FaRegHeart, FaSearch, FaRegUser } from 'react-icons/fa';
-import { RiStore2Line } from "react-icons/ri";
-import { GrChat } from "react-icons/gr";
-import { AiOutlineShoppingCart } from "react-icons/ai";
-import './Uppernav.css';
+import { GrChat } from 'react-icons/gr';
 import axios from 'axios';
+import './Uppernav.css';
 
 const UpperNav = ({ userLoggedIn }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [country, setCountry] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
   const navigate = useNavigate();
   const { user, setUser } = useContext(UserContext);
 
@@ -58,6 +58,28 @@ const UpperNav = ({ userLoggedIn }) => {
     navigate(path);
   };
 
+  const handleSearch = async (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    if (query.length > 1) {
+      try {
+        const response = await axios.get(`http://localhost:5001/search?query=${query}`);
+        setSearchResults(response.data);
+      } catch (error) {
+        console.error('Error fetching search results:', error);
+      }
+    } else {
+      setSearchResults([]);
+    }
+  };
+
+  const handleSelectResult = (productId) => {
+    navigate(`/Product/${productId}`);
+    setSearchQuery('');
+    setSearchResults([]);
+  };
+
   // List of allowed countries
   const allowedCountries = ['Morocco', 'France', 'Maroc'];
   const isAllowedCountry = allowedCountries.includes(country);
@@ -74,8 +96,26 @@ const UpperNav = ({ userLoggedIn }) => {
         </div>
         <div className={`nav-links ${showMenu ? 'show' : ''}`}>
           <div className="searchholder">
-            <input type="text" placeholder="RECHERCHER" />
+            <input
+              type="text"
+              placeholder="RECHERCHER"
+              value={searchQuery}
+              onChange={handleSearch}
+            />
             <button className="search-button"><FaSearch /></button>
+            {searchResults.length > 0 && (
+              <div className="search-results">
+                {searchResults.map((product) => (
+                  <div
+                    key={product._id}
+                    onClick={() => handleSelectResult(product._id)}
+                    className="search-result-item"
+                  >
+                    {product.name}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           {user ? (
             <>
@@ -110,7 +150,7 @@ const UpperNav = ({ userLoggedIn }) => {
         </div>
       </nav>
       <div className="categories-bar">
-        {['Immobilier', 'Vehicules', 'Motos', 'Telephones', 'Ordinateurs', 'Vetements', 'Books', 'Electromenagers', 'Astuces Maison', 'Autres'].map((category) => (
+        {['Immobilier', 'Véhicules', 'Motos', 'Telephones', 'Ordinateurs', 'Vetements', 'Livres', 'Electromenagers', 'Astuces Maison', 'Autres'].map((category) => (
           <span key={category} onClick={() => navigateTo(`/products/category/${category}`)}>{category}</span>
         ))}
       </div>

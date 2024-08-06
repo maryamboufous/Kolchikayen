@@ -1,68 +1,80 @@
-.categories {
-    width: 100%;
+.category-products {
+    width: 90%;
+    margin: 0 auto;
+  }
+  
+  
+  .product-list {
     display: flex;
-    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+  .product-item {
+    position: relative;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 15px;
+    width: 220px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+    text-align: center;
+  }
+  .product-item:hover {
+    transform: scale(1.05);
+  }
+  
+  .btntoprod {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
-    padding: 40px 0;
-}
-
-.categories-title {
-    width: 90%;
-    display: flex;
     align-items: center;
-    justify-content: space-between;
-}
-
-.categories-slider {
-    width: 90%;
+  }
+  
+  .btntoprod img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+  
+  .listing-details {
+    margin-top: 10px;
+  }
+  
+  .heart-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px; /* Changed to right */
+    width: 30px; /* Increased size for better fit */
+    height: 32px;
+    cursor: pointer;
+    background-color: white;
+    border-radius: 50%;
+    padding: 4px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-}
-
-.categories-slider img {
-    width: 250px;
-    transition: transform 0.5s ease-in-out;
-}
-
-.arrow {
-    background-color: transparent;
+  }
+  
+  .heart-icon img {
+    width: 20px; 
+    height: 20px; 
+  }
+  
+  button {
+    padding: 10px 20px;
+    margin-top: 10px;
     border: none;
-    font-size: 2rem;
+    border-radius: 5px;
+    background-color: #1976d2;
+    color: #fff;
     cursor: pointer;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 10;
-    color: black;
-}
-
-.arrow.prev {
-    left: 10px;
-}
-
-.arrow.next {
-    right: 10px;
-}
-
-@media (max-width: 768px) {
-    .categories-slider img {
-        width: 150px;
-    }
-
-    .arrow {
-        font-size: 1.5rem;
-    }
-}
-
-@media (max-width: 468px) {
-    .categories-slider img {
-        width: 100px;
-    }
-
-    .arrow {
-        font-size: 1rem;
-    }
-}
+  }
+  
+  button:hover {
+    background-color: #1565c0;
+  }
+  

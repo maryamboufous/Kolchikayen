@@ -147,7 +147,7 @@ const EditProduct = () => {
     setSearchText(place.display_name);
     setListPlace([]);
   
-    if (place.address.country === 'France' || place.address.country === 'Morocco') {
+    if (place.address.country === 'France' || place.address.country === 'Morocco'|| place.address.country === 'Maroc') {
       setErrorMessage('');
     } else {
       setErrorMessage('Le service n\'est pas disponible dans ce pays');
@@ -257,7 +257,7 @@ const EditProduct = () => {
             onChange={handleInputChange}
           >
             <MenuItem value="Immobilier">Immobilier</MenuItem>
-            <MenuItem value="Vehicules">Vehicules</MenuItem>
+            <MenuItem value="Vehicules">Véhicules</MenuItem>
             <MenuItem value="Telephone">Telephones</MenuItem>
             <MenuItem value="Ordinateurs">Ordinateurs</MenuItem>
             <MenuItem value="Motos">Motos</MenuItem>
