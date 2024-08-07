@@ -316,8 +316,7 @@ const AddProductForm = () => {
   const handleImageUpload = async (imageFile) => {
     const formData = new FormData();
     formData.append('file', imageFile);
-    formData.append('upload_preset', 'koulchikayn'); // Replace with your Cloudinary preset
-  
+    formData.append('upload_preset', 'koulchikayn'); 
     try {
       const response = await fetch('https://api.cloudinary.com/v1_1/ds4qhqy8k/image/upload', {
         method: 'POST',
@@ -510,7 +509,7 @@ const AddProductForm = () => {
                   error={Boolean(errors.productCondition)}
                   helperText={errors.productCondition}
                 >
-                <MenuItem value="" disabled>Select condition</MenuItem>
+                <MenuItem value="" disabled>Selectionner la condition</MenuItem>
                 <MenuItem value="Neuf">Neuf</MenuItem>
                 <MenuItem value="Comme neuf">Comme neuf</MenuItem>
                 <MenuItem value="Bon état">Bon état</MenuItem>
@@ -526,7 +525,7 @@ const AddProductForm = () => {
                   onChange={() => setDonation(!donation)}
                 />
                 {donation ? (
-                  <Typography>Ce produit est un don.</Typography>
+                  <Typography>Ce produit est un don ( GRATUIT ).</Typography>
                 ) : (
                   <TextField
                     label="Prix"

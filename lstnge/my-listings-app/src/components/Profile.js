@@ -15,10 +15,13 @@ const Profile = () => {
     postalCode: '',
     country: 'France',
     email: '',
-    newPassword: '',
-    confirmPassword: '',
     announcements: [],
     profileImage: ''
+  });
+
+  const [passwordData, setPasswordData] = useState({
+    newPassword: '',
+    confirmPassword: '',
   });
 
   const [loading, setLoading] = useState(true);
@@ -60,19 +63,31 @@ const Profile = () => {
     }));
   };
 
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
   const handleProfileImageChange = (e) => {
     setProfileImageFile(e.target.files[0]);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (userData.newPassword !== userData.confirmPassword) {
+
+    if (passwordData.newPassword && passwordData.newPassword !== passwordData.confirmPassword) {
       alert('Passwords do not match');
       return;
     }
 
     const updatedData = { ...userData };
-    delete updatedData.confirmPassword;
+
+    if (passwordData.newPassword) {
+      updatedData.newPassword = passwordData.newPassword;
+    }
 
     try {
       const response = await fetch(`http://localhost:5001/users/${user._id}`, {
@@ -89,6 +104,8 @@ const Profile = () => {
           ...userData,
           ...data.user,
           dateOfBirth: data.user.dateOfBirth ? new Date(data.user.dateOfBirth).toISOString().split('T')[0] : '',
+        });
+        setPasswordData({
           newPassword: '',
           confirmPassword: '',
         });
@@ -206,7 +223,7 @@ const Profile = () => {
                 onChange={handleInputChange}
               >
                 <option value="France">France</option>
-                <option value="Morocco">Morocco</option>
+                <option value="Morocco">Maroc</option>
               </select>
             </div>
             <div className="profileField">
@@ -223,8 +240,8 @@ const Profile = () => {
               <input
                 type="password"
                 name="newPassword"
-                value={userData.newPassword}
-                onChange={handleInputChange}
+                value={passwordData.newPassword}
+                onChange={handlePasswordChange}
               />
             </div>
             <div className="profileField">
@@ -232,8 +249,8 @@ const Profile = () => {
               <input
                 type="password"
                 name="confirmPassword"
-                value={userData.confirmPassword}
-                onChange={handleInputChange}
+                value={passwordData.confirmPassword}
+                onChange={handlePasswordChange}
               />
             </div>
             <div className="profileField">
@@ -244,7 +261,7 @@ const Profile = () => {
           </form>
         </div>
       ) : (
-        <div>Loading...</div>
+        <div>En cours...</div>
       )}
     </div>
   );

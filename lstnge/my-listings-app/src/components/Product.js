@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { UserContext } from '../context/UserContext';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/swiper-bundle.css'; // Correct path for Swiper styles
 import './Product.css';
 import userimg from '../assets/user-img.webp';
 import whatsappimg from '../assets/whatsapp.svg';
@@ -36,7 +34,8 @@ const Product = () => {
   }, [productId]);
 
   const navigateToProfile = (userId) => {
-    navigate(``);
+    // navigate(`/profile/${userId}`);
+    navigate('');
   };
 
   const addToCart = async (productId) => {
@@ -52,7 +51,7 @@ const Product = () => {
       const data = await response.json();
       if (data.status === 'ok') {
         console.log('Product added to cart successfully');
-        setCartItemCount((prevCount) => prevCount + 1); // Increment cart item count
+        setCartItemCount((prevCount) => prevCount + 1);
       }
     } catch (error) {
       console.error('Error adding to cart:', error);
@@ -60,7 +59,8 @@ const Product = () => {
   };
 
   const navigateToBuy = () => {
-    navigate(`/Buy/${productId}`);  };
+    navigate(`/Buy/${productId}`);
+  };
 
   const toggleLike = async (productId) => {
     if (!user) {
@@ -91,16 +91,16 @@ const Product = () => {
   };
 
   if (!product) {
-    return <div>Loading...</div>;
+    return <div>En cours...</div>;
   }
 
   return (
     <div className="Product_container">
-        <div className="product-images">
-          {product.images.map((image, index) => (
-            <img key={index} src={image} alt={`Product ${index}`} />
-          ))}
-        </div>
+      <div className="product-images">
+        {product.images.map((image, index) => (
+          <img key={index} src={image} alt={`Product ${index}`} />
+        ))}
+      </div>
       <div className="first-informations">
         <div className="title-box">
           <p className="title">{product.name}</p>
@@ -118,7 +118,7 @@ const Product = () => {
           By {product.userId.name}
           <img
             onClick={() => navigateToProfile(product.userId._id)}
-            src={userimg}
+            src={product.userId.profileImage || userimg}
             alt="User Profile"
           />
         </div>

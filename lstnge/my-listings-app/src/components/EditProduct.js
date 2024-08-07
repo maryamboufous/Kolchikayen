@@ -130,7 +130,7 @@ const EditProduct = () => {
   };
 
   const handleRemoveImage = (index) => {
-    setFormValues({ ...formValues, productImages: formValues.productImages.filter((_, i) => i !== index) });
+    setFormValues({ ...formValues, productImCartes: formValues.productImages.filter((_, i) => i !== index) });
   };
 
   const handlePlaceSelect = (place) => {
@@ -186,7 +186,7 @@ const EditProduct = () => {
 
   const handleUpdateProduct = async () => {
     if (!user) {
-      console.error('User is not authenticated');
+      console.error('Vous devew vous authentifier !');
       return;
     }
   
@@ -279,7 +279,7 @@ const EditProduct = () => {
             />
           )}
           <TextField
-            label="Description"
+            label="Déscription"
             variant="outlined"
             fullWidth
             margin="normal"

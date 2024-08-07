@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { UserContext } from '../context/UserContext';
 import { Link } from 'react-router-dom';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './Cart.css'; 
 import heartEmpty from '../assets/heart_empty.png';
 import heartLike from '../assets/like.png';
@@ -11,6 +11,7 @@ const Cart = () => {
   const [cartProducts, setCartProducts] = useState([]);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  
   useEffect(() => {
     const fetchCartProducts = async () => {
       if (!user || !user._id) {
@@ -74,9 +75,9 @@ const Cart = () => {
     }
   };
 
-  const navigateToBuy =() =>{
-    navigate(`/Buy/${productId}`);  };
-
+  const navigateToBuy = (productId) => {
+    navigate(`/Buy/${productId}`);
+  };
 
   return (
     <div className="cart">
@@ -103,7 +104,7 @@ const Cart = () => {
                 <h3>{product.name}</h3>
                 <p>{product.price} €</p>
 
-                <button className="btn btn-danger" onClick={navigateToBuy}>Acheter</button>
+                <button className="btn btn-danger" onClick={() => navigateToBuy(product._id)}>Acheter</button>
 
                 <button className="btn btn-danger" onClick={() => handleRemoveFromCart(product._id)}>
                   Annuler
@@ -112,7 +113,7 @@ const Cart = () => {
             </div>
           ))
         ) : (
-          <p>No products in cart yet.</p>
+          <p>Aucun Produit dans le panier.</p>
         )}
       </div>
     </div>

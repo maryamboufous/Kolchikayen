@@ -29,7 +29,7 @@ const CountryListings = () => {
       <h1>Liste des Produits de {country}</h1>
       <div className="listing-items">
         {products.length === 0 ? (
-          <p>No products found for this country.</p>
+          <p>Aucun produit trouvé pour ce produit.</p>
         ) : (
           products.map((product) => (
             <div className="listing-item" key={product._id}>
@@ -49,7 +49,7 @@ const CountryListings = () => {
               <div className="heart-icon">
                 <img src={heartEmpty} alt="like button" />
               </div>
-              <button>Add to Cart</button>
+              <button>Ajouter au panier:</button>
             </div>
           ))
         )}

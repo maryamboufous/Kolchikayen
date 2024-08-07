@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../context/UserContext';
 import { FaRegHeart, FaSearch, FaRegUser } from 'react-icons/fa';
 import { GrChat } from 'react-icons/gr';
+import { DiAptana } from "react-icons/di";
 import axios from 'axios';
 import './Uppernav.css';
 
@@ -92,7 +93,7 @@ const UpperNav = ({ userLoggedIn }) => {
           <span onClick={() => navigateTo('/Home')} className="username">KOLCHIKAYN</span>
         </div>
         <div className="country">
-          Country: {country ? <span>{country}</span> : <span>Loading...</span>}
+          Pays: {country ? <span>{country}</span> : <span>En cours...</span>}
         </div>
         <div className={`nav-links ${showMenu ? 'show' : ''}`}>
           <div className="searchholder">
@@ -121,7 +122,7 @@ const UpperNav = ({ userLoggedIn }) => {
             <>
               <button onClick={() => navigateTo('/Profile')} className="icon-button"><FaRegUser /></button>
               <button onClick={() => navigateTo('/Favoris')} className="icon-button"><FaRegHeart /></button>
-              <button onClick={() => navigateTo('/Messages')} className="icon-button"><GrChat /></button>
+              <button onClick={() => navigateTo('/Messages')} className="icon-button"><DiAptana /></button>
               <span className="welcome-text">Bienvenue {user ? user.name : ''} !</span>
               <button onClick={() => navigateTo('/userpage/add-product-form')} className="post-ad">Déposer une annonce</button>
               <button onClick={handleLogout} className="logout">Déconnexion</button>

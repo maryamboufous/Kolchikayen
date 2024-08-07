@@ -256,7 +256,7 @@ app.post('/unlike-product', async (req, res) => {
 app.get('/products/:productId', async (req, res) => {
   const { productId } = req.params;
   try {
-    const product = await Product.findById(productId).populate('userId', 'name');
+    const product = await Product.findById(productId).populate('userId', 'name profileImage');
     if (!product) {
       return res.status(404).json({ status: 'error', message: 'Product not found' });
     }
@@ -265,6 +265,7 @@ app.get('/products/:productId', async (req, res) => {
     res.status(500).json({ status: 'error', message: 'Internal server error' });
   }
 });
+
 
 app.delete('/products/:id', async (req, res) => {
   const productId = req.params.id;

@@ -62,8 +62,8 @@ const Store = () => {
             <div className="product-details">
               <h3>{product.name}</h3>
               <p>{product.price} €</p>
-              <button className="delete-btn" onClick={() => deleteProduct(product._id)}>Delete</button>
-              <Link to={`/edit-product/${product._id}`} className="edit-btn">Edit</Link>
+              <button className="delete-btn" onClick={() => deleteProduct(product._id)}>Supprimer</button>
+              <Link to={`/edit-product/${product._id}`} className="edit-btn">Modifier</Link>
             </div>
           </div>
         ))}

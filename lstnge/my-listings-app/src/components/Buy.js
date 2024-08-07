@@ -26,20 +26,20 @@ const Buy = () => {
   }, [productId]);
 
   if (!product) {
-    return <div>Loading...</div>;
+    return <div>En cours...</div>;
   }
 
   return (
     <div className="buy-container">
-      <h1>Veuillez contacter le vendeur pour acheter, voici lES informations dont vous aurez besoin</h1>
+      <h1>Veuillez contacter le vendeur pour acheter, voici les informations dont vous aurez besoin ! </h1>
       <div className="product-details">      <h4>{product.name}</h4>
 
         <p><strong>Description:</strong> {product.description}</p>
-        <p><strong>Price:</strong> ${product.price}</p>
+        <p><strong>Prix:</strong> ${product.price}</p>
         <p><strong>Condition:</strong> {product.condition}</p>
-        <p><strong>Category:</strong> {product.category}</p>
+        <p><strong>Categorie:</strong> {product.category}</p>
         <p><strong>Email:</strong> {product.email}</p>
-        <p><strong>Phone:</strong> {product.phone}</p>
+        <p><strong>Telephone:</strong> {product.phone}</p>
         <div className="product-images">
           {product.images.map((image, index) => (
             <img key={index} src={image} alt={`Product ${index}`} />

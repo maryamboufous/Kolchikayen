@@ -91,7 +91,7 @@ const CategoryProducts = () => {
                 <img src={`http://localhost:5001/product-image/${product._id}/0`} alt={product.name} />
                 <div className="listing-details">
                   <h3>{product.name}</h3>
-                  <p>{product.price} DH</p>
+                  <p>{product.price} €</p>
                   <p>
                     <small className="text-muted">Publié par {product.userId ? product.userId.name : 'Unknown'}</small>
                   </p>

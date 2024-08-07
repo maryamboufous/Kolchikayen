@@ -113,7 +113,7 @@ const Favoris = () => {
             );
           })
         ) : (
-          <p>No favorite products found.</p>
+          <p>Aucun produit favoris n'est trouvé .</p>
         )}
       </div>
     </div>

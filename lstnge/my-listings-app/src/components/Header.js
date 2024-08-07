@@ -31,11 +31,7 @@ const Header = () => {
           <li><a href='#' className="France">France</a></li>
         </ul>
 
-        {/* <div className="auth-buttons">
-          <button>Déposer une annonce</button>
-          <button onClick={navigateToSignup}>Créer un compte</button>
-          <button onClick={navigateToLogin}>Se connecter</button>
-        </div> */}
+
         
       </nav>
     </header>
