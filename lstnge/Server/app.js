@@ -12,9 +12,8 @@ const axios = require('axios');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const cloudinary = require('cloudinary').v2;
-
+const jwt = require('jsonwebtoken');
 const dbURI = 'mongodb://maryam:Merybouf123@ac-qxsgsof-shard-00-01.najmn7n.mongodb.net:27017,ac-qxsgsof-shard-00-00.najmn7n.mongodb.net:27017,ac-qxsgsof-shard-00-02.najmn7n.mongodb.net:27017/?authSource=admin&replicaSet=atlas-znq6hh-shard-0&retryWrites=true&w=majority&appName=Cluster0&ssl=true';
-
 mongoose.connect(dbURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -25,20 +24,27 @@ mongoose.connect(dbURI, {
     wtimeout: 5000
   }
 })
-  .then(() => console.log('Database Connected'))
-  .catch((err) => console.error('Database connection error:', err));
+.then(() => console.log('Database Connected'))
+.catch((err) => console.error('Database connection error:', err));
 require('./userDetails');
 require('./ProductDetails');
 require('./LikedProduct');
+require('./adminDetails');
 
 const User = mongoose.model("UserInfo");
 const Product = mongoose.model("Product");
 const LikedProduct = mongoose.model("LikedProduct");
+const Admin = mongoose.model('AdminInfo');
 
 app.use(express.json());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
+const adminEmail = process.env.Admin_Email;
+const adminPassword = process.env.Admin_Password;
 
 
 // Nodemailer setup
@@ -96,6 +102,44 @@ const upload = multer({ storage: storage });
 app.get("/", (req, res) => {
   res.send({ status: "started" });
 });
+
+// Admin Login
+app.post('/admin/login', async (req, res) => {
+    const { email, password } = req.body;
+  console.log('Received credentials:', email, password);
+
+  if (email === adminEmail && password === adminPassword) {
+    const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: '1h' });
+    res.json({ status: 'ok', token });
+  } else {
+    console.log('Invalid credentials');
+    res.status(401).json({ status: 'error', message: 'Invalid email or password' });
+  }
+});
+
+// Add this route in your app.js
+app.get('/admin/stats', async (req, res) => {
+  try {
+    const userCount = await User.countDocuments();
+    const productCount = await Product.countDocuments();
+    const totalLikes = await LikedProduct.countDocuments();
+
+    res.json({
+      status: 'ok',
+      data: {
+        userCount,
+        productCount,
+        totalLikes
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching admin stats:', error);
+    res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+});
+
+
+
 /// Add Product in Listings
 app.post('/add-product', upload.array('images', 12), async (req, res) => {
   const {
@@ -267,18 +311,22 @@ app.get('/products/:productId', async (req, res) => {
 });
 
 
+
 app.delete('/products/:id', async (req, res) => {
   const productId = req.params.id;
 
   try {
-    // Delete the product from the products collection
+    // Delete the product from the Products collection
     await Product.findByIdAndDelete(productId);
 
-    // Delete the product reference from users' collections
-    await User.updateMany({}, { $pull: { products_to_sell: productId } });
-
-    // Delete any liked products related to this product
+    // Remove the product from the LikedProduct collection
     await LikedProduct.deleteMany({ productId });
+
+    // Remove the product from the liked_products array in UserInfo collection
+    await User.updateMany({}, { $pull: { liked_products: productId } });
+
+    // Remove the product from the products_to_sell array in UserInfo collection (if applicable)
+    await User.updateMany({}, { $pull: { products_to_sell: productId } });
 
     res.status(204).send();
   } catch (error) {
@@ -568,7 +616,9 @@ app.post('/check-email', async (req, res) => {
 // Sign Up
 app.post('/signup', async (req, res) => {
   const { name, email, mobile, password } = req.body;
-
+  if (email === adminEmail) {
+    return res.status(400).json({ status: 'error', message: 'Email is reserved for admin' });
+  }
   try {
     const encryptedPassword = await bcrypt.hash(password, 10);
 

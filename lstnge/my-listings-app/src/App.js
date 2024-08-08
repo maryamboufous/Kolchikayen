@@ -1,3 +1,4 @@
+// src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Home from './components/Home';
@@ -16,10 +17,13 @@ import Cart from './components/Cart';
 import Buy from './components/Buy';
 import CountryListings from './components/CountryListings';
 import { UserProvider } from './context/UserContext';
+import { AdminProvider } from './context/AdminContext';
 import { CountryProvider } from './context/CountryContext';
 import Uppernav from './components/Uppernav';
 import SecondaryNav from './components/SecondaryNav';
 import RouteGuard from './components/RouteGuard';
+import AdminLogin from './components/Accounts/AdminLogin';
+import AdminDashboard from './components/Admin/AdminDashboard'; 
 import './App.css';
 
 const App = () => {
@@ -29,33 +33,36 @@ const App = () => {
                            location.pathname.startsWith('/Cart') ||
                            location.pathname.startsWith('/store') ||
                            location.pathname.startsWith('/Favoris');
-
   return (
     <div className="app">
       <UserProvider>
         <CountryProvider>
-          <Uppernav userLoggedIn={true} />
-          {showSecondaryNav && <SecondaryNav />}
-          <Routes>
-            <Route path="/Home" element={<Home />} />
-            <Route path="/login" element={<RouteGuard><Login /></RouteGuard>} />
-            <Route path="/signup" element={<RouteGuard><Sign /></RouteGuard>} />
-            <Route path="/country/:country" element={<CountryListings />} />
-            <Route path="/Product/:productId" element={<Product />} />
-            <Route path="/Profile" element={<RouteGuard><Profile /></RouteGuard>} />
-            <Route path="/Favoris" element={<RouteGuard><Favoris /></RouteGuard>} />
-            <Route path="/Cart" element={<RouteGuard><Cart /></RouteGuard>} />
-            <Route path="/Buy/:productId" element={<RouteGuard><Buy /></RouteGuard>} />
-            <Route path="/" element={<Home />} />
-            <Route path="/Messages" element={<RouteGuard><Messages /></RouteGuard>} />
-            <Route path="/Allcategories" element={<AllCats />} />
-            <Route path="/userpage" element={<Home />} />
-            <Route path="/userpage/add-product-form" element={<RouteGuard><AddProductForm /></RouteGuard>} />
-            <Route path="/store" element={<RouteGuard><Store /></RouteGuard>} />
-            <Route path="/edit-product/:productId" element={<RouteGuard><EditProduct /></RouteGuard>} />
-            <Route path="/all-categories" element={<AllCats />} />
-            <Route path="/products/category/:category" element={<CategoryProducts />} />
-          </Routes>
+          <AdminProvider>
+            <Uppernav userLoggedIn={true} />
+            {showSecondaryNav && <SecondaryNav />}
+            <Routes>
+              <Route path="/Home" element={<Home />} />
+              <Route path="/login" element={<RouteGuard><Login /></RouteGuard>} />
+              <Route path="/signup" element={<RouteGuard><Sign /></RouteGuard>} />
+              <Route path="/country/:country" element={<CountryListings />} />
+              <Route path="/Product/:productId" element={<Product />} />
+              <Route path="/Profile" element={<RouteGuard><Profile /></RouteGuard>} />
+              <Route path="/Favoris" element={<RouteGuard><Favoris /></RouteGuard>} />
+              <Route path="/Cart" element={<RouteGuard><Cart /></RouteGuard>} />
+              <Route path="/Buy/:productId" element={<RouteGuard><Buy /></RouteGuard>} />
+              <Route path="/" element={<Home />} />
+              <Route path="/Messages" element={<RouteGuard><Messages /></RouteGuard>} />
+              <Route path="/Allcategories" element={<AllCats />} />
+              <Route path="/userpage" element={<Home />} />
+              <Route path="/userpage/add-product-form" element={<RouteGuard><AddProductForm /></RouteGuard>} />
+              <Route path="/store" element={<RouteGuard><Store /></RouteGuard>} />
+              <Route path="/edit-product/:productId" element={<RouteGuard><EditProduct /></RouteGuard>} />
+              <Route path="/all-categories" element={<AllCats />} />
+              <Route path="/products/category/:category" element={<CategoryProducts />} />
+              <Route path="/admin" element={<AdminLogin />} />
+              <Route path="/admin/dashboard" element={<AdminDashboard />} /> {/* Add this line */}
+            </Routes>
+          </AdminProvider>
         </CountryProvider>
       </UserProvider>
     </div>
